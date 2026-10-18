@@ -433,13 +433,18 @@ $vn_base = trailingslashit( get_template_directory_uri() );
   .pg-main > * { animation: ab-fade-in 1s var(--ease) both; }
   .pg-main > * + * { animation-delay: .15s; }
 
-  /* the header holds more links now: between tablet and small desktop they move into the Menu */
+  /* header: the page links open from a [ Menu ] toggle, sliding in one after another */
   .nav-end { gap: 1rem; white-space: nowrap; }
-  @media (min-width: 768px) and (max-width: 1299px) {
-    #navbar .nav-menu, #navbar .nav-end { display: none; }
-    #menu-btn.mobile-only { display: block !important; grid-column: 3; }
+  .nav-drop { position: relative; }
+  body.is-artwork .nav-drop { display: none; }
+  .nav-links {
+    position: absolute; top: calc(100% + .75rem); right: 0;
+    display: flex; flex-direction: column; align-items: flex-end; gap: .375rem; pointer-events: none;
   }
-  body.is-artwork #navbar .nav-extra { display: none !important; }
+  .nav-drop.is-open .nav-links { pointer-events: auto; }
+  .nav-links a { display: flex; overflow: hidden; }
+  .nav-li { display: inline-flex; transform: translateY(110%); transition: transform .45s var(--ease-in-out); }
+  .nav-drop.is-open .nav-li { transform: translateY(0); transition-delay: calc(var(--i) * 50ms); }
 
   /* footer: cookie policy in the third column */
   .l-footer-end a { margin: -.25rem; display: inline-flex; }
@@ -708,21 +713,18 @@ $vn_base = trailingslashit( get_template_directory_uri() );
       </a>
     </nav>
     <div class="nav-end">
-      <a class="group lbl-row text-sm uppercase nav-about" href="#/about">
-        <span class="lbl"><span data-i18n="aboutAction">About the Project</span></span>
-      </a>
-      <a class="group lbl-row text-sm uppercase nav-extra" href="#/team">
-        <span class="lbl"><span data-i18n="team">Team</span></span>
-      </a>
-      <a class="group lbl-row text-sm uppercase nav-extra" href="#/news">
-        <span class="lbl"><span data-i18n="news">News</span></span>
-      </a>
-      <a class="group lbl-row text-sm uppercase nav-extra" href="#/services">
-        <span class="lbl"><span data-i18n="services">Services</span></span>
-      </a>
-      <a class="group lbl-row text-sm uppercase nav-extra" href="#/contact">
-        <span class="lbl"><span data-i18n="contact">Contact</span></span>
-      </a>
+      <div class="nav-drop" id="nav-drop">
+        <button type="button" class="group lbl-row text-sm uppercase nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links">
+          <span class="lbl-bracket">[</span><span class="lbl"><span data-i18n="menu">Menu</span></span><span class="lbl-bracket">]</span>
+        </button>
+        <nav class="nav-links text-sm uppercase" id="nav-links" inert>
+        <a class="group" href="#/about" style="--i:0"><span class="nav-li"><span class="lbl"><span data-i18n="aboutAction">About the Artist</span></span></span></a>
+        <a class="group" href="#/team" style="--i:1"><span class="nav-li"><span class="lbl"><span data-i18n="team">Team</span></span></span></a>
+        <a class="group" href="#/news" style="--i:2"><span class="nav-li"><span class="lbl"><span data-i18n="news">News</span></span></span></a>
+        <a class="group" href="#/services" style="--i:3"><span class="nav-li"><span class="lbl"><span data-i18n="services">Services</span></span></span></a>
+        <a class="group" href="#/contact" style="--i:4"><span class="nav-li"><span class="lbl"><span data-i18n="contact">Contact</span></span></span></a>
+        </nav>
+      </div>
       <a class="group lbl-row text-sm uppercase aw-close" href="#/close">
         <span class="lbl-bracket">[</span><span class="lbl"><span data-i18n="close">Close</span></span><span class="lbl-bracket">]</span>
       </a>
@@ -3136,6 +3138,29 @@ $vn_base = trailingslashit( get_template_directory_uri() );
       .to(pgFooter, { autoAlpha: 0, duration: .3, ease: "linear" }, .15 * Math.max(0, sections.length - 1));
     return tl;
   }
+
+  /* ============ header menu: [ Menu ] reveals the page links ============ */
+  const navDrop = document.getElementById("nav-drop");
+  const navToggle = document.getElementById("nav-toggle");
+  const navLinks = document.getElementById("nav-links");
+  function setNavDrop(open) {
+    navDrop.classList.toggle("is-open", open);
+    navToggle.setAttribute("aria-expanded", open);
+    navLinks.inert = !open;
+    const label = navToggle.querySelector("[data-i18n]");
+    label.dataset.i18n = open ? "close" : "menu";
+    label.textContent = t(label.dataset.i18n);
+    // refresh the black hover chip so it shows the new label
+    if (navToggle.matches(":hover")) navToggle.dispatchEvent(new Event("mouseenter"));
+  }
+  navToggle.addEventListener("click", () => setNavDrop(!navDrop.classList.contains("is-open")));
+  // a link was chosen, or the click landed elsewhere: close
+  document.addEventListener("click", (e) => {
+    if (navDrop.classList.contains("is-open") && !navToggle.contains(e.target)) setNavDrop(false);
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && navDrop.classList.contains("is-open")) { setNavDrop(false); navToggle.focus(); }
+  });
 
   /* ============ routing: Grid / List / Gallery / About / Artwork / pages ============ */
   let view = null, routeId = 0, gridBooted = false, lenis = null, backHash = "#/";

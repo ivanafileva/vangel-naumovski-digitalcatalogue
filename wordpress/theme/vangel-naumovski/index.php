@@ -2737,22 +2737,18 @@ $vn_base = trailingslashit( get_template_directory_uri() );
             points: ["За училишта и ликовни клубови", "Материјалите се вклучени", "Околу два часа"] } },
   ];
 
-  // the people behind the catalogue (fictional)
+  // the people behind the catalogue (the email addresses are placeholders)
   const TEAM = [
-    { email: "elena", en: { name: "Elena Trajkovska", role: "Curator", bio: "Leads the catalogue: researches each painting, its date and its story, and writes the texts." },
-                      mk: { name: "Елена Трајковска", role: "Кураторка", bio: "Го води каталогот: ја истражува секоја слика, нејзиниот датум и приказна и ги пишува текстовите." } },
-    { email: "marko", en: { name: "Marko Petrovski", role: "Archivist", bio: "Traces works in museum records, auction catalogues and private collections, and checks every source." },
-                      mk: { name: "Марко Петровски", role: "Архивист", bio: "Ги бара делата во музејски записи, аукциски каталози и приватни збирки и го проверува секој извор." } },
-    { email: "ana",   en: { name: "Ana Stojanovska", role: "Education & tours", bio: "Leads the guided walks through Ohrid and the workshops for schools and art clubs." },
-                      mk: { name: "Ана Стојановска", role: "Едукација и тури", bio: "Ги води прошетките низ Охрид и работилниците за училишта и ликовни клубови." } },
-    { email: "bojan", en: { name: "Bojan Nikolovski", role: "Licensing & loans", bio: "Handles reproduction requests and helps museums and galleries borrow works for exhibitions." },
-                      mk: { name: "Бојан Николовски", role: "Лиценцирање и позајмици", bio: "Ги обработува барањата за репродукција и им помага на музеите и галериите да позајмат дела за изложби." } },
+    { email: "ivana",  en: { name: "Ivana Fileva", role: "Design & development", bio: "Designed and built the website: the grid, list and gallery views, the artwork pages and the WordPress theme." },
+                       mk: { name: "Ивана Филева", role: "Дизајн и развој", bio: "Ја дизајнираше и изработи веб-страната: мрежата, листата и галеријата, страниците за делата и WordPress темата." } },
+    { email: "marija", en: { name: "Marija Karapandžova", role: "Research & content", bio: "Researches the paintings and prepares the texts, stories and translations for the catalogue." },
+                       mk: { name: "Марија Карапанџова", role: "Истражување и содржина", bio: "Ги истражува сликите и ги подготвува текстовите, приказните и преводите за каталогот." } },
   ];
 
   const PAGE_TEXT = {
     en: {
       newsIntro: "News, features and stories about Vangel Naumovski and his paintings.",
-      teamIntro: "A small team of researchers and educators keeps the catalogue growing and answers your questions.",
+      teamIntro: "The people behind the catalogue, who keep it growing and answer your questions.",
       servicesIntro: "We help researchers, publishers, museums and schools work with the paintings of Vangel Naumovski.",
       contactIntro: "Questions, requests or information about a work we have missed? Write to us.",
       cookiesIntro: "This site uses as few cookies as possible.",
@@ -2766,7 +2762,7 @@ $vn_base = trailingslashit( get_template_directory_uri() );
     },
     mk: {
       newsIntro: "Вести, текстови и приказни за Ванѓел Наумовски и неговите слики.",
-      teamIntro: "Мал тим на истражувачи и едукатори се грижи каталогот да расте и одговара на вашите прашања.",
+      teamIntro: "Луѓето зад каталогот, кои се грижат тој да расте и одговараат на вашите прашања.",
       servicesIntro: "Им помагаме на истражувачи, издавачи, музеи и училишта да работат со сликите на Ванѓел Наумовски.",
       contactIntro: "Прашања, барања или информации за дело што сме го пропуштиле? Пишете ни.",
       cookiesIntro: "Оваа страница користи што е можно помалку колачиња.",

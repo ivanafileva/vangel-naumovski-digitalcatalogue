@@ -450,6 +450,8 @@ $vn_base = trailingslashit( get_template_directory_uri() );
   /* the grid's search bar moves down to make room for the open menu */
   #search-ui { transition: opacity 1s, transform .5s var(--ease-in-out); }
   body.nav-open #search-ui { transform: translateY(var(--nav-push, 0px)); }
+  #list-main { transition: transform .5s var(--ease-in-out); }
+  body.nav-open #list-main { transform: translateY(var(--nav-push, 0px)); }
   .nav-toggle:focus:not(:focus-visible) { outline: none; }
   .nav-links a { display: flex; overflow: hidden; }
   .nav-li { display: inline-flex; transform: translateY(110%); transition: transform .45s var(--ease-in-out); }
@@ -3153,13 +3155,16 @@ $vn_base = trailingslashit( get_template_directory_uri() );
   const navDrop = document.getElementById("nav-drop");
   const navToggle = document.getElementById("nav-toggle");
   const navLinks = document.getElementById("nav-links");
+  const listMainEl = document.getElementById("list-main"), listBarEl = listMainEl.querySelector(".list-bar");
   function setNavDrop(open) {
     navDrop.classList.toggle("is-open", open);
     navLinks.classList.toggle("is-open", open);
-    // the grid's search bar sits where the links open: it moves down below them
+    // the search bars of the grid and the List page sit where the links open: they move down below them
     if (open) {
-      const push = navLinks.getBoundingClientRect().bottom + 16 - parseFloat(getComputedStyle(searchUI).top);
-      searchUI.style.setProperty("--nav-push", `${Math.max(0, push)}px`);
+      const bottom = navLinks.getBoundingClientRect().bottom + 16;
+      const pushOf = (el) => { const r = el.getBoundingClientRect(); return r.height && r.bottom > 0 && r.top < bottom ? bottom - r.top : 0; };
+      searchUI.style.setProperty("--nav-push", `${pushOf(searchUI)}px`);
+      listMainEl.style.setProperty("--nav-push", `${pushOf(listBarEl)}px`);
     }
     document.body.classList.toggle("nav-open", open);
     if (open && S.open) closeAll();

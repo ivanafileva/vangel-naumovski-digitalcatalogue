@@ -435,18 +435,24 @@ $vn_base = trailingslashit( get_template_directory_uri() );
 
   /* header: the page links open from a [ Menu ] toggle, sliding in one after another */
   .nav-end { gap: 1rem; white-space: nowrap; }
-  .nav-drop { position: relative; display: flex; align-items: center; }
+  .nav-drop { position: relative; }
   body.is-artwork .nav-drop { display: none; }
   .nav-links {
-    position: absolute; top: 50%; right: calc(100% + 1rem); translate: 0 -50%;
-    display: flex; align-items: center; gap: 1rem; white-space: nowrap; pointer-events: none;
+    position: fixed; top: 3.25rem; right: 1rem; z-index: 9999;
+    display: flex; flex-direction: column; align-items: flex-end; gap: .375rem;
+    padding: .75rem .75rem .875rem; background: #000; color: #fff;
+    clip-path: inset(0 0 100% 0); transition: clip-path .5s var(--ease-in-out); pointer-events: none;
   }
-  .nav-links.is-open { pointer-events: auto; }
+  @media (min-width: 96rem) { .nav-links { right: 1.5rem; } }
+  @media (max-width: 767px) { .nav-links { display: none; } }
+  body.is-artwork .nav-links { display: none; }
+  .nav-links.is-open { clip-path: inset(0); pointer-events: auto; }
   .nav-links a { display: flex; overflow: hidden; }
   .nav-li { display: inline-flex; transform: translateY(110%); transition: transform .45s var(--ease-in-out); }
-  /* they rise one after another, starting next to the button */
-  .nav-links.is-open .nav-li { transform: translateY(0); transition-delay: calc((4 - var(--i)) * 50ms); }
-  body.nav-crowded #navbar .nav-menu { opacity: 0; pointer-events: none; }
+  .nav-links.is-open .nav-li { transform: translateY(0); transition-delay: calc(.1s + var(--i) * 50ms); }
+  /* the Search buttons of the grid and the List page sit under the panel: only they move down below it */
+  #search-field, #l-search { transition: transform .5s var(--ease-in-out); }
+  body.nav-open #search-field, body.nav-open #l-search { position: relative; z-index: 20; transform: translateY(var(--nav-push, 0px)); }
   .nav-toggle:focus:not(:focus-visible) { outline: none; }
 
   /* footer: cookie policy in the third column */
@@ -720,13 +726,6 @@ $vn_base = trailingslashit( get_template_directory_uri() );
         <button type="button" class="group lbl-row text-sm uppercase nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links">
           <span class="lbl-bracket">[</span><span class="lbl"><span data-i18n="menu">Menu</span></span><span class="lbl-bracket">]</span>
         </button>
-        <nav class="nav-links text-sm uppercase" id="nav-links" inert>
-        <a class="group" href="#/about" style="--i:0"><span class="nav-li"><span class="lbl"><span data-i18n="aboutAction">About the Artist</span></span></span></a>
-        <a class="group" href="#/team" style="--i:1"><span class="nav-li"><span class="lbl"><span data-i18n="team">Team</span></span></span></a>
-        <a class="group" href="#/news" style="--i:2"><span class="nav-li"><span class="lbl"><span data-i18n="news">News</span></span></span></a>
-        <a class="group" href="#/services" style="--i:3"><span class="nav-li"><span class="lbl"><span data-i18n="services">Services</span></span></span></a>
-        <a class="group" href="#/contact" style="--i:4"><span class="nav-li"><span class="lbl"><span data-i18n="contact">Contact</span></span></span></a>
-      </nav>
       </div>
       <a class="group lbl-row text-sm uppercase aw-close" href="#/close">
         <span class="lbl-bracket">[</span><span class="lbl"><span data-i18n="close">Close</span></span><span class="lbl-bracket">]</span>
@@ -735,6 +734,14 @@ $vn_base = trailingslashit( get_template_directory_uri() );
     <button type="button" class="menu-btn mobile-only uppercase" id="menu-btn" data-i18n="menu">Menu</button>
   </div>
 </header>
+
+<nav class="nav-links text-sm uppercase" id="nav-links" inert>
+  <a class="group" href="#/about" style="--i:0"><span class="nav-li"><span class="lbl"><span data-i18n="aboutAction">About the Artist</span></span></span></a>
+  <a class="group" href="#/team" style="--i:1"><span class="nav-li"><span class="lbl"><span data-i18n="team">Team</span></span></span></a>
+  <a class="group" href="#/news" style="--i:2"><span class="nav-li"><span class="lbl"><span data-i18n="news">News</span></span></span></a>
+  <a class="group" href="#/services" style="--i:3"><span class="nav-li"><span class="lbl"><span data-i18n="services">Services</span></span></span></a>
+  <a class="group" href="#/contact" style="--i:4"><span class="nav-li"><span class="lbl"><span data-i18n="contact">Contact</span></span></span></a>
+      </nav>
 
 <div id="search-ui" class="px-global">
   <search class="search-col text-sm uppercase">
@@ -3146,12 +3153,20 @@ $vn_base = trailingslashit( get_template_directory_uri() );
   const navDrop = document.getElementById("nav-drop");
   const navToggle = document.getElementById("nav-toggle");
   const navLinks = document.getElementById("nav-links");
+  const searchFieldEl = document.getElementById("search-field"), listSearchEl = document.getElementById("l-search");
   function setNavDrop(open) {
     navDrop.classList.toggle("is-open", open);
     navLinks.classList.toggle("is-open", open);
-    // when there is not enough room, the Grid / List / Gallery links step aside while the menu is open
-    const crowded = navLinks.getBoundingClientRect().left < document.querySelector("#navbar .nav-menu").getBoundingClientRect().right + 24;
-    document.body.classList.toggle("nav-crowded", open && crowded);
+    // the Search buttons of the grid and the List page sit under the panel: they move down below it
+    if (open) {
+      const bottom = navLinks.getBoundingClientRect().bottom + 12;
+      [searchFieldEl, listSearchEl].forEach((el) => {
+        const r = el.getBoundingClientRect();
+        el.style.setProperty("--nav-push", `${r.height && r.bottom > 0 && r.top < bottom ? bottom - r.top : 0}px`);
+      });
+      if (S.open) closeAll();
+    }
+    document.body.classList.toggle("nav-open", open);
     navToggle.setAttribute("aria-expanded", open);
     navLinks.inert = !open;
     const label = navToggle.querySelector("[data-i18n]");

@@ -501,19 +501,39 @@ $vn_base = trailingslashit( get_template_directory_uri() );
   @media (min-width: 768px) { .pg-form-row { grid-template-columns: 1fr 1fr; column-gap: 2rem; } }
   .pg-field { position: relative; display: grid; gap: .35rem; }
   .pg-label { color: var(--muted); }
-  .pg-field input, .pg-field select, .pg-field textarea {
+  .pg-field input, .pg-field textarea {
     width: 100%; padding: .35rem 0; border: 0; border-bottom: 1px solid rgba(0, 0, 0, .3); border-radius: 0;
     background: transparent; font: inherit; letter-spacing: inherit; color: var(--foreground); outline: none; appearance: none;
     transition: border-color .2s;
   }
   .pg-field textarea { min-height: 7.5rem; resize: vertical; }
-  .pg-field select {
-    cursor: pointer; padding-right: 1.25rem;
-    background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%);
-    background-position: calc(100% - 9px) 55%, calc(100% - 4px) 55%; background-size: 5px 5px; background-repeat: no-repeat;
+  .pg-field input:focus, .pg-field textarea:focus { border-bottom-color: var(--foreground); }
+  .pg-field.has-error input, .pg-field.has-error textarea { border-bottom-color: var(--foreground); }
+  /* subject picker: [ + ] toggle like the Story panel, options with a [■] check like the List filters */
+  .pg-sel-btn {
+    display: flex; width: 100%; align-items: center; justify-content: space-between; gap: 1rem;
+    padding: .35rem 0; border-bottom: 1px solid rgba(0, 0, 0, .3); text-align: left; letter-spacing: inherit;
+    transition: border-color .2s;
   }
-  .pg-field input:focus, .pg-field select:focus, .pg-field textarea:focus { border-bottom-color: var(--foreground); }
-  .pg-field.has-error input, .pg-field.has-error select, .pg-field.has-error textarea { border-bottom-color: var(--foreground); }
+  .pg-select[data-open="true"] .pg-sel-btn, .pg-sel-btn:focus-visible { border-bottom-color: var(--foreground); outline: none; }
+  .pg-sel-btn:hover .aw-br-l, .pg-select[data-open="true"] .aw-br-l { transform: translateX(.375rem); }
+  .pg-sel-btn:hover .aw-br-r, .pg-select[data-open="true"] .aw-br-r { transform: translateX(-.375rem); }
+  .pg-sel-minus, .pg-sel-plus { display: flex; width: 1rem; height: 1rem; align-items: center; justify-content: center; }
+  .pg-sel-minus, .pg-select[data-open="true"] .pg-sel-plus { display: none; }
+  .pg-select[data-open="true"] .pg-sel-minus { display: flex; }
+  .pg-sel-list { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .5s var(--ease-in-out); }
+  .pg-select[data-open="true"] .pg-sel-list { grid-template-rows: 1fr; }
+  .pg-sel-clip { min-height: 0; overflow: hidden; }
+  .pg-sel-opts { display: flex; flex-direction: column; align-items: flex-start; gap: .375rem; padding: .75rem 0 .25rem; }
+  .pg-opt { display: inline-flex; overflow: hidden; text-align: left; letter-spacing: inherit; outline: none; }
+  .pg-opt-inner {
+    display: inline-flex; align-items: center; gap: .375rem; transform: translateY(110%);
+    transition: transform .5s var(--ease-in-out); transition-delay: 0s;
+  }
+  .pg-select[data-open="true"] .pg-opt-inner { transform: translateY(0); transition-delay: calc(var(--i) * 45ms); }
+  .pg-opt[aria-selected="true"] .check svg { transform: translateY(-1px) scale(1); }
+  .pg-opt:focus-visible .lbl::after { transform: scaleX(1); }
+  .pg-opt:focus-visible .lbl { color: #fff; }
   .pg-error { min-height: 1.3em; color: var(--foreground); text-transform: uppercase; }
   .pg-error:empty { min-height: 0; }
   .pg-error:not(:empty)::before { content: "[ ! ] "; }
@@ -2823,8 +2843,22 @@ $vn_base = trailingslashit( get_template_directory_uri() );
   function renderContact() {
     const L = lang2(), subject = pendingSubject || "general";
     pendingSubject = "";
-    const opts = [["general", t("subjGeneral")], ...SERVICES.map((s) => [s.key, s[L].title])]
-      .map(([k, v]) => `<option value="${k}"${k === subject ? " selected" : ""}>${esc(v)}</option>`).join("");
+    const subjects = [["general", t("subjGeneral")], ...SERVICES.map((s) => [s.key, s[L].title])];
+    const current = subjects.find(([k]) => k === subject) || subjects[0];
+    // subject picker: opens like the Story panel, options slide in like the List filters
+    const picker = `<div class="pg-field pg-select" data-f="subject" data-open="false">
+        <span class="pg-label" id="pg-subj-label">${t("fSubject")}</span>
+        <input type="hidden" name="subject" value="${current[0]}">
+        <button type="button" class="pg-sel-btn" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="pg-subj-label pg-subj-value">
+          <span class="pg-sel-value" id="pg-subj-value">${esc(current[1])}</span>
+          <span class="aw-toggle"><span class="aw-br aw-br-l">[ </span> <span class="pg-sel-minus">-</span><span class="pg-sel-plus">+</span> <span class="aw-br aw-br-r"> ]</span></span>
+        </button>
+        <div class="pg-sel-list" inert><div class="pg-sel-clip"><div class="pg-sel-opts" role="listbox" aria-labelledby="pg-subj-label">
+          ${subjects.map(([k, v], i) => `<button type="button" role="option" class="pg-opt group" style="--i:${i}" data-value="${k}" aria-selected="${k === current[0]}">
+            <span class="pg-opt-inner"><span class="check">[${BOX}]</span><span class="lbl lbl-ink"><span>${esc(v)}</span></span></span></button>`).join("")}
+        </div></div></div>
+        <span class="pg-error"></span>
+      </div>`;
     const input = (name, label, attrs = "") =>
       `<label class="pg-field" data-f="${name}"><span class="pg-label">${label}</span>${attrs}<span class="pg-error"></span></label>`;
     const form = `<form class="pg-form text-sm" id="pg-form" novalidate>
@@ -2832,7 +2866,7 @@ $vn_base = trailingslashit( get_template_directory_uri() );
           ${input("name", t("fName"), `<input name="name" autocomplete="name" maxlength="100">`)}
           ${input("email", t("fEmail"), `<input name="email" type="email" autocomplete="email" maxlength="150">`)}
         </div>
-        ${input("subject", t("fSubject"), `<select name="subject">${opts}</select>`)}
+        ${picker}
         ${input("message", t("fMessage"), `<textarea name="message" maxlength="5000"></textarea>`)}
         <div class="pg-hp" aria-hidden="true"><label>Website <input name="website" tabindex="-1" autocomplete="off"></label></div>
         <div class="pg-field" data-f="consent">
@@ -3011,6 +3045,45 @@ $vn_base = trailingslashit( get_template_directory_uri() );
     if (a.dataset.subject) pendingSubject = a.dataset.subject;
     navigate(a.getAttribute("href"));
   });
+  // subject picker
+  function setPicker(sel, open) {
+    sel.dataset.open = open;
+    sel.querySelector(".pg-sel-btn").setAttribute("aria-expanded", open);
+    sel.querySelector(".pg-sel-list").inert = !open;
+    lenis?.resize();
+  }
+  pgMain.addEventListener("click", (e) => {
+    const sel = e.target.closest(".pg-select");
+    if (!sel) return;
+    if (e.target.closest(".pg-sel-btn")) {
+      const open = sel.dataset.open !== "true";
+      setPicker(sel, open);
+      if (open) setTimeout(() => sel.querySelector('.pg-opt[aria-selected="true"]')?.focus({ preventScroll: true }), 50);
+      return;
+    }
+    const opt = e.target.closest(".pg-opt");
+    if (!opt) return;
+    sel.querySelector('input[name="subject"]').value = opt.dataset.value;
+    sel.querySelector(".pg-sel-value").textContent = opt.querySelector(".lbl").textContent;
+    sel.querySelectorAll(".pg-opt").forEach((o) => o.setAttribute("aria-selected", o === opt));
+    setPicker(sel, false);
+    sel.querySelector(".pg-sel-btn").focus({ preventScroll: true });
+  });
+  pgMain.addEventListener("keydown", (e) => {
+    const sel = e.target.closest(".pg-select");
+    if (!sel || sel.dataset.open !== "true") return;
+    const opts = [...sel.querySelectorAll(".pg-opt")], i = opts.indexOf(document.activeElement);
+    if (e.key === "Escape") { e.preventDefault(); setPicker(sel, false); sel.querySelector(".pg-sel-btn").focus(); }
+    else if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      e.preventDefault();
+      opts[(i + (e.key === "ArrowDown" ? 1 : -1) + opts.length) % opts.length].focus();
+    }
+  });
+  document.addEventListener("click", (e) => {
+    const sel = pgMain.querySelector('.pg-select[data-open="true"]');
+    if (sel && !sel.contains(e.target)) setPicker(sel, false);
+  });
+
   pgMain.addEventListener("submit", (e) => {
     if (e.target.id !== "pg-form") return;
     e.preventDefault();

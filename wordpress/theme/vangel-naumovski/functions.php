@@ -27,3 +27,67 @@ add_action(
 	},
 	100
 );
+
+/**
+ * Contact form: each message is saved as a private "Message" that editors
+ * read under Messages in the dashboard (they cannot be created there by hand).
+ */
+add_action(
+	'init',
+	function () {
+		register_post_type(
+			'vn_message',
+			array(
+				'labels'          => array(
+					'name'          => 'Messages',
+					'singular_name' => 'Message',
+				),
+				'public'          => false,
+				'show_ui'         => true,
+				'menu_icon'       => 'dashicons-email',
+				'supports'        => array( 'title', 'editor', 'custom-fields' ),
+				'capability_type' => 'post',
+				'capabilities'    => array( 'create_posts' => 'do_not_allow' ),
+				'map_meta_cap'    => true,
+			)
+		);
+	}
+);
+
+function vn_contact_submit() {
+	if ( ! check_ajax_referer( 'vn_contact', 'nonce', false ) ) {
+		wp_send_json_error( array( 'code' => 'nonce' ), 403 );
+	}
+	// hidden field that only bots fill in: answer as if it worked, store nothing
+	if ( ! empty( $_POST['website'] ) ) {
+		wp_send_json_success();
+	}
+	$name    = sanitize_text_field( wp_unslash( $_POST['name'] ?? '' ) );
+	$email   = sanitize_email( wp_unslash( $_POST['email'] ?? '' ) );
+	$subject = sanitize_key( wp_unslash( $_POST['subject'] ?? 'general' ) );
+	$message = sanitize_textarea_field( wp_unslash( $_POST['message'] ?? '' ) );
+	$lang    = sanitize_key( wp_unslash( $_POST['lang'] ?? '' ) );
+	if ( '' === $name || ! is_email( $email ) || mb_strlen( $message ) < 10 || empty( $_POST['consent'] ) ) {
+		wp_send_json_error( array( 'code' => 'invalid' ), 422 );
+	}
+	$id = wp_insert_post(
+		array(
+			'post_type'    => 'vn_message',
+			'post_status'  => 'private',
+			'post_title'   => mb_substr( $name . ' (' . $subject . ')', 0, 200 ),
+			'post_content' => mb_substr( $message, 0, 5000 ),
+			'meta_input'   => array(
+				'email'   => $email,
+				'subject' => $subject,
+				'lang'    => $lang,
+			),
+		),
+		true
+	);
+	if ( is_wp_error( $id ) ) {
+		wp_send_json_error( array( 'code' => 'save' ), 500 );
+	}
+	wp_send_json_success();
+}
+add_action( 'wp_ajax_vn_contact', 'vn_contact_submit' );
+add_action( 'wp_ajax_nopriv_vn_contact', 'vn_contact_submit' );

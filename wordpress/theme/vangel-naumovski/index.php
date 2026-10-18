@@ -1,7 +1,7 @@
 <?php
 /**
  * The whole site is a single page with its own #/ routes (grid, list, gallery,
- * about, artwork pages), so every WordPress URL renders this same document.
+ * about, artwork, news, services, contact and cookie pages), so every WordPress URL renders this same document.
  *
  * @package Vangel_Naumovski
  */
@@ -422,6 +422,122 @@ $vn_base = trailingslashit( get_template_directory_uri() );
   .aw-item-img { position: relative; aspect-ratio: 1; width: 100%; overflow: hidden; background: rgba(23, 23, 23, .1); }
   .aw-item-img img { width: 100%; height: 100%; object-fit: cover; }
 
+  /* ---------- presentation pages: news, article, services, contact, cookies ----------
+     built from the same pieces as the About and artwork pages so they read as one site */
+  body.is-page #content { opacity: 0 !important; visibility: hidden !important; pointer-events: none !important; }
+  body.is-page #search-ui, body.is-page #s-backdrop, body.is-page #s-results { display: none !important; }
+  body.is-page { height: auto; overflow: visible; }
+  #page-view { display: none; min-height: 100dvh; flex-direction: column; overflow-x: clip; }
+  body.is-page #page-view { display: flex; }
+  .pg-main { flex: 1; padding-top: 126px; }
+  .pg-main > * { animation: ab-fade-in 1s var(--ease) both; }
+  .pg-main > * + * { animation-delay: .15s; }
+
+  /* the header holds more links now: between tablet and small desktop they move into the Menu */
+  .nav-end { gap: 1rem; white-space: nowrap; }
+  @media (min-width: 768px) and (max-width: 1199px) {
+    #navbar .nav-menu, #navbar .nav-end { display: none; }
+    #menu-btn.mobile-only { display: block !important; grid-column: 3; }
+  }
+  body.is-artwork #navbar .nav-extra { display: none !important; }
+
+  /* footer: cookie policy in the third column */
+  .l-footer-end a { margin: -.25rem; display: inline-flex; }
+
+  /* intro: the centred text column of the About page */
+  .pg-col { width: 352px; max-width: 100%; margin: 2rem auto 5rem; }
+  @media (min-width: 1024px) { .pg-col { margin: 129px auto 7rem; } }
+  .pg-col .text-paint > * + * { margin-top: 1.75rem; }
+  .pg-col h2 { font-size: .8125rem; font-weight: 400; text-transform: uppercase; }
+  .pg-col .text-paint > h2:not(:first-child) { margin-top: 3rem; }
+  .pg-col .text-paint > h2 + p { margin-top: .75rem; }
+  .pg-status { margin-top: 3rem; }
+  .pg-actions { margin-top: 1rem; margin-left: -.25rem; }
+
+  /* list rows (news) reuse the artworks table; hovering a row shows its picture like the List page */
+  .pg-list { padding-bottom: 4rem; }
+  .pg-list .l-thumb { right: 12rem; top: 50%; bottom: auto; translate: 0 -50%; pointer-events: none; }
+  @media (min-width: 768px) { .pg-list .l-thumb { display: block; } }
+  .pg-list .ab-item:hover .l-thumb { scale: 1; opacity: 1; }
+
+  /* news article: picture | text | facts, like an artwork page */
+  .pg-art { display: grid; grid-template-areas: "text" "fig" "sheet"; gap: 3rem; padding: 2rem 0 6rem; letter-spacing: -0.04em; }
+  @media (min-width: 1024px) {
+    .pg-art { grid-template-areas: "fig text sheet"; grid-template-columns: minmax(0, 1fr) 352px minmax(0, 1fr); column-gap: 2rem; padding-top: 129px; }
+    .pg-art-fig, .pg-art-sheet { position: sticky; top: 126px; align-self: start; }
+  }
+  .pg-art-text { grid-area: text; }
+  .pg-art-fig { grid-area: fig; margin: 0; }
+  .pg-art-fig .reveal-image { aspect-ratio: 4 / 5; width: min(100%, 343px); }
+  .pg-art-fig figcaption { margin-top: .5rem; }
+  .pg-art-sheet { grid-area: sheet; }
+  .pg-main .aw-sheet { padding-top: 0; }
+  .pg-back { margin: 0 0 2.5rem -.25rem; }
+  .pg-date { color: var(--muted); margin-bottom: .5rem; }
+  .pg-title { margin-bottom: 1.75rem; font-size: .8125rem; font-weight: 400; text-transform: uppercase; }
+  .pg-lead { margin-bottom: 1.75rem; }
+  .pg-body > p + p { margin-top: 1.75rem; }
+  .pg-ink { margin-left: -.25rem; }
+  .pg-ink a { display: inline-flex; }
+
+  /* services: four sheets with a picture each, like the strip under an artwork */
+  .pg-services { display: grid; grid-template-columns: 1fr; gap: 4rem 1rem; padding-bottom: 6rem; letter-spacing: -0.04em; }
+  @media (min-width: 768px) { .pg-services { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 2rem; } }
+  @media (min-width: 1024px) { .pg-services { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+  .pg-svc .reveal-image { aspect-ratio: 4 / 5; margin-bottom: 1rem; }
+  .pg-svc-title { margin: .25rem 0 1rem; font-size: .8125rem; font-weight: 400; text-transform: uppercase; }
+  .pg-svc p { margin-bottom: 1rem; }
+  .pg-svc ul { list-style: none; margin-bottom: 1.25rem; color: var(--muted); }
+  .pg-svc li::before { content: "— "; }
+  .pg-svc .lbl-row { margin-left: -.25rem; width: fit-content; }
+
+  /* contact: facts on the left like an artwork sheet, the form across the other two columns */
+  .pg-contact { display: grid; grid-template-columns: 1fr; gap: 4rem; padding-bottom: 6rem; letter-spacing: -0.04em; }
+  @media (min-width: 1024px) { .pg-contact { grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 2rem; } }
+  .pg-contact .aw-sheet-grid { align-content: start; }
+  .pg-form, .pg-sent { display: grid; gap: 1.5rem; align-content: start; }
+  @media (min-width: 1024px) { .pg-form, .pg-sent { grid-column: span 2; } }
+  .pg-form-row { display: grid; gap: 1.5rem; }
+  @media (min-width: 768px) { .pg-form-row { grid-template-columns: 1fr 1fr; column-gap: 2rem; } }
+  .pg-field { position: relative; display: grid; gap: .35rem; }
+  .pg-label { color: var(--muted); }
+  .pg-field input, .pg-field select, .pg-field textarea {
+    width: 100%; padding: .35rem 0; border: 0; border-bottom: 1px solid rgba(0, 0, 0, .3); border-radius: 0;
+    background: transparent; font: inherit; letter-spacing: inherit; color: var(--foreground); outline: none; appearance: none;
+    transition: border-color .2s;
+  }
+  .pg-field textarea { min-height: 7.5rem; resize: vertical; }
+  .pg-field select {
+    cursor: pointer; padding-right: 1.25rem;
+    background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%);
+    background-position: calc(100% - 9px) 55%, calc(100% - 4px) 55%; background-size: 5px 5px; background-repeat: no-repeat;
+  }
+  .pg-field input:focus, .pg-field select:focus, .pg-field textarea:focus { border-bottom-color: var(--foreground); }
+  .pg-field.has-error input, .pg-field.has-error select, .pg-field.has-error textarea { border-bottom-color: var(--foreground); }
+  .pg-error { min-height: 1.3em; color: var(--foreground); text-transform: uppercase; }
+  .pg-error:empty { min-height: 0; }
+  .pg-error:not(:empty)::before { content: "[ ! ] "; }
+  .pg-check { display: flex; gap: .4rem; align-items: baseline; cursor: pointer; color: var(--muted); }
+  .pg-check input { position: absolute; opacity: 0; pointer-events: none; }
+  .pg-check .box { color: var(--foreground); flex-shrink: 0; }
+  .pg-check .box svg { display: inline; margin: 0 .125rem; width: .25em; height: .25em; transform: translateY(-1px) scale(0); transition: transform .2s; }
+  .pg-check input:checked + .box svg { transform: translateY(-1px) scale(1); }
+  .pg-check input:focus-visible + .box { outline: 1px solid currentColor; outline-offset: 2px; }
+  .pg-hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+  .pg-submit { justify-self: start; margin-left: -.25rem; text-transform: uppercase; }
+  .pg-submit[disabled] { opacity: .5; pointer-events: none; }
+  .pg-sent .lbl-row { margin-left: -.25rem; width: fit-content; }
+
+  /* cookie banner: a black card like the hover fills, with bracket buttons */
+  #cookie-banner {
+    position: fixed; left: 1rem; bottom: 1rem; z-index: 9990; width: 22rem; max-width: calc(100vw - 2rem);
+    padding: 1rem; background: #000; color: #fff; visibility: hidden; opacity: 0;
+  }
+  @media (min-width: 96rem) { #cookie-banner { left: 1.5rem; bottom: 1.5rem; } }
+  #cookie-banner p { margin-bottom: 1rem; color: #d4d4d4; }
+  .cb-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1rem; margin-left: -.25rem; }
+
+
   /* ---------- gallery view (/gallery) ---------- */
   #gallery-view {
     position: fixed; inset: 0; display: none; height: 100dvh; overflow: hidden;
@@ -571,6 +687,15 @@ $vn_base = trailingslashit( get_template_directory_uri() );
       <a class="group lbl-row text-sm uppercase nav-about" href="#/about">
         <span class="lbl"><span data-i18n="aboutAction">About the Project</span></span>
       </a>
+      <a class="group lbl-row text-sm uppercase nav-extra" href="#/news">
+        <span class="lbl"><span data-i18n="news">News</span></span>
+      </a>
+      <a class="group lbl-row text-sm uppercase nav-extra" href="#/services">
+        <span class="lbl"><span data-i18n="services">Services</span></span>
+      </a>
+      <a class="group lbl-row text-sm uppercase nav-extra" href="#/contact">
+        <span class="lbl"><span data-i18n="contact">Contact</span></span>
+      </a>
       <a class="group lbl-row text-sm uppercase aw-close" href="#/close">
         <span class="lbl-bracket">[</span><span class="lbl"><span data-i18n="close">Close</span></span><span class="lbl-bracket">]</span>
       </a>
@@ -637,6 +762,7 @@ $vn_base = trailingslashit( get_template_directory_uri() );
   <div class="l-footer-grid">
     <p class="l-footer-muted" data-i18n="rights">All rights reserved ©</p>
     <p class="l-footer-muted" data-i18n="place">Skopje, North Macedonia</p>
+    <p class="l-footer-muted l-footer-end"><a class="group" href="#/cookies"><span class="lbl lbl-ink"><span data-i18n="cookies">Cookie policy</span></span></a></p>
   </div>
  </footer>
 </div>
@@ -684,6 +810,7 @@ $vn_base = trailingslashit( get_template_directory_uri() );
   <div class="l-footer-grid">
     <p class="l-footer-muted" data-i18n="rights">All rights reserved ©</p>
     <p class="l-footer-muted" data-i18n="place">Skopje, North Macedonia</p>
+    <p class="l-footer-muted l-footer-end"><a class="group" href="#/cookies"><span class="lbl lbl-ink"><span data-i18n="cookies">Cookie policy</span></span></a></p>
   </div>
  </footer>
 </div>
@@ -725,6 +852,20 @@ $vn_base = trailingslashit( get_template_directory_uri() );
   <div class="l-footer-grid">
     <p class="l-footer-muted" data-i18n="rights">All rights reserved ©</p>
     <p class="l-footer-muted" data-i18n="place">Skopje, North Macedonia</p>
+    <p class="l-footer-muted l-footer-end"><a class="group" href="#/cookies"><span class="lbl lbl-ink"><span data-i18n="cookies">Cookie policy</span></span></a></p>
+  </div>
+ </footer>
+</div>
+
+<div id="page-view">
+ <main class="pg-main px-global" id="pg-main"></main>
+ <footer class="l-footer px-global text-sm" id="p-footer">
+  <div class="l-footer-rule"></div>
+  <div class="l-footer-title"><span data-count>48</span> <span data-i18n="titleSuffix">Art Works</span></div>
+  <div class="l-footer-grid">
+    <p class="l-footer-muted" data-i18n="rights">All rights reserved ©</p>
+    <p class="l-footer-muted" data-i18n="place">Skopje, North Macedonia</p>
+    <p class="l-footer-muted l-footer-end"><a class="group" href="#/cookies"><span class="lbl lbl-ink"><span data-i18n="cookies">Cookie policy</span></span></a></p>
   </div>
  </footer>
 </div>
@@ -734,6 +875,15 @@ $vn_base = trailingslashit( get_template_directory_uri() );
   <a class="g-link" id="g-link" href="#/artwork/1" draggable="false" aria-label=""></a>
   <div class="g-label" id="g-label"><p class="g-num"></p><p class="g-name"></p></div>
 </main>
+
+<div id="cookie-banner" class="text-sm" role="region" aria-label="Cookies">
+  <p data-i18n="cookieText">We use one cookie to remember your choice and, if you accept, your language. Nothing else.</p>
+  <div class="cb-actions uppercase">
+    <button type="button" class="group lbl-row uppercase" id="cb-accept"><span class="lbl-bracket">[</span><span class="lbl"><span data-i18n="accept">Accept</span></span><span class="lbl-bracket">]</span></button>
+    <button type="button" class="group lbl-row uppercase" id="cb-decline"><span class="lbl-bracket">[</span><span class="lbl"><span data-i18n="decline">Decline</span></span><span class="lbl-bracket">]</span></button>
+    <a class="group lbl-row uppercase" href="#/cookies"><span class="lbl"><span data-i18n="cookiesMore">Cookie policy</span></span></a>
+  </div>
+</div>
 
 <div class="lang text-sm uppercase">
   <a class="group" href="#" data-locale="mk"><span class="lbl"><span>MK</span></span></a>
@@ -748,6 +898,9 @@ $vn_base = trailingslashit( get_template_directory_uri() );
       <a class="uppercase" href="#/archive" data-i18n="list">List</a>
       <a class="uppercase" href="#/gallery" data-i18n="gallery">Gallery</a>
       <a class="uppercase" href="#/about" data-i18n="about">About us</a>
+      <a class="uppercase" href="#/news" data-i18n="news">News</a>
+      <a class="uppercase" href="#/services" data-i18n="services">Services</a>
+      <a class="uppercase" href="#/contact" data-i18n="contact">Contact</a>
     </nav>
   </div>
   <div class="m-foot">
@@ -770,6 +923,7 @@ $vn_base = trailingslashit( get_template_directory_uri() );
 <script>
 (() => {
   const ASSET_BASE = <?php echo wp_json_encode( $vn_base ); ?>;
+  window.VN_CONTACT = <?php echo wp_json_encode( array( 'url' => admin_url( 'admin-ajax.php' ), 'nonce' => wp_create_nonce( 'vn_contact' ) ) ); ?>;
   /* ============ config (values taken from the original layout) ============ */
   const COUNT = 197;
   const PER_ROW = 20;
@@ -793,6 +947,17 @@ $vn_base = trailingslashit( get_template_directory_uri() );
       rights: "All rights reserved ©", place: "Skopje, North Macedonia",
       aboutTitle: "About the artist", works: "Artworks", searchWorkPh: "Search artwork…", discover: "[ DISCOVER ]",
       story: "Story", artistLabel: "Artist", fTitle: "Title", fYear: "Year", fPeriod: "Period", fMedium: "Medium", fSize: "Size", fSource: "Source",
+      news: "News", services: "Services", contact: "Contact", cookies: "Cookie policy",
+      articles: "Articles", read: "[ READ ]", fDate: "Date", fSection: "Section", relatedWork: "Related artwork", nextArticle: "Next article",
+      enquire: "Enquire", fEmail: "Email", fPhone: "Phone", fHours: "Hours", hoursVal: "Mon–Fri, 10:00–16:00", fAddress: "Address",
+      fName: "Name", fSubject: "Subject", subjGeneral: "General question", fMessage: "Message",
+      consent: "I agree that my message is stored so that you can reply to me.", send: "Send", sending: "Sending…",
+      sentTitle: "Message sent", sentText: "Thank you for writing. We usually reply within a few working days.", sendAnother: "New message",
+      errRequired: "Required", errEmail: "Enter a valid email address", errShort: "Please write a little more", errConsent: "Please agree to continue",
+      errSend: "The message could not be sent. Please try again, or write to us by email.",
+      cookieText: "We use one cookie to remember your choice and, if you accept, your language. Nothing else.",
+      accept: "Accept", decline: "Decline", cookiesMore: "Cookie policy", cookieStatus: "Your choice",
+      cAccepted: "accepted", cDeclined: "declined", cNone: "not chosen yet",
     },
     mk: {
       titleSuffix: "уметнички дела", grid: "Мрежа", list: "Листа", gallery: "Галерија",
@@ -804,6 +969,17 @@ $vn_base = trailingslashit( get_template_directory_uri() );
       rights: "Сите права се задржани ©", place: "Скопје, Северна Македонија",
       aboutTitle: "За уметникот", works: "Дела", searchWorkPh: "Пребарај дело…", discover: "[ ОТКРИЈ ]",
       story: "Приказна", artistLabel: "Уметник", fTitle: "Наслов", fYear: "Година", fPeriod: "Период", fMedium: "Техника", fSize: "Димензии", fSource: "Извор",
+      news: "Вести", services: "Услуги", contact: "Контакт", cookies: "Политика за колачиња",
+      articles: "Написи", read: "[ ПРОЧИТАЈ ]", fDate: "Датум", fSection: "Рубрика", relatedWork: "Поврзано дело", nextArticle: "Следен напис",
+      enquire: "Побарај", fEmail: "Е-пошта", fPhone: "Телефон", fHours: "Работно време", hoursVal: "Пон–Пет, 10:00–16:00", fAddress: "Адреса",
+      fName: "Име", fSubject: "Тема", subjGeneral: "Општо прашање", fMessage: "Порака",
+      consent: "Се согласувам мојата порака да биде зачувана за да може да ми одговорите.", send: "Испрати", sending: "Се испраќа…",
+      sentTitle: "Пораката е испратена", sentText: "Ви благодариме што ни пишавте. Обично одговараме во рок од неколку работни дена.", sendAnother: "Нова порака",
+      errRequired: "Задолжително", errEmail: "Внесете валидна е-пошта", errShort: "Ве молиме напишете малку повеќе", errConsent: "Ве молиме потврдете за да продолжите",
+      errSend: "Пораката не можеше да се испрати. Обидете се повторно или пишете ни по е-пошта.",
+      cookieText: "Користиме едно колаче за да го запомниме вашиот избор и, ако прифатите, вашиот јазик. Ништо друго.",
+      accept: "Прифати", decline: "Одбиј", cookiesMore: "Политика за колачиња", cookieStatus: "Ваш избор",
+      cAccepted: "прифатено", cDeclined: "одбиено", cNone: "сè уште не е избрано",
     },
   };
   const CATEGORIES = [
@@ -1317,10 +1493,11 @@ $vn_base = trailingslashit( get_template_directory_uri() );
     if (listBuilt) { renderListCats(); renderList(false); }
     if (view === "artwork" && artId) renderArtwork(artId);
     if (view === "about") { renderAboutText(); renderAboutSearch(); renderAboutList(); sizeAboutDesk(); measureAbout(); updateAbout(window.scrollY); }
+    if (isPage(view)) rerenderPage();
   }
   document.querySelectorAll(".lang [data-locale]").forEach((a) => a.addEventListener("click", (e) => {
     e.preventDefault();
-    if (a.dataset.locale !== locale) { locale = a.dataset.locale; applyLocale(); }
+    if (a.dataset.locale !== locale) { locale = a.dataset.locale; applyLocale(); rememberLang(); }
   }));
 
   /* ============ solid black hover fill for labels in the blended layers ============ */
@@ -1361,8 +1538,7 @@ $vn_base = trailingslashit( get_template_directory_uri() );
         onComplete: () => { menu.style.display = "none"; gsap.set(menu, { clipPath: "polygon(-1% 0%, -1% 0%, -1% 100%, -1% 100%)" }); } });
     }
   });
-  // Grid and List switch views; the other pages are not built yet
-  const isRouteLink = (a) => ["#/", "#/archive", "#/gallery", "#/about"].includes(a.getAttribute("href"));
+  const isRouteLink = (a) => ["#/", "#/archive", "#/gallery", "#/about", "#/news", "#/services", "#/contact", "#/cookies"].includes(a.getAttribute("href"));
   document.querySelectorAll('a[href^="#/"]').forEach((a) => {
     if (a.classList.contains("gi")) return;
     a.addEventListener("click", (e) => {
@@ -2434,13 +2610,441 @@ $vn_base = trailingslashit( get_template_directory_uri() );
   });
   document.querySelector("#aw-artist-reveal a").addEventListener("click", (e) => { e.preventDefault(); navigate("#/about"); });
 
-  /* ============ routing: Grid / List / Gallery / About / Artwork ============ */
-  let view = null, gridBooted = false, lenis = null, backHash = "#/";
-  const ROUTES = { "#/": "grid", "#/archive": "list", "#/gallery": "gallery", "#/about": "about" };
-  const HREFS = { grid: "#/", list: "#/archive", gallery: "#/gallery", about: "#/about" };
+  /* ============ presentation pages: content (EN / MK) ============ */
+  const CONTACT_INFO = {
+    email: "contact@vangelnaumovski.example",
+    phone: "+389 46 000 000",
+  };
+
+  // news, newest first; `art` is the related artwork number
+  const NEWS = [
+    { slug: "catalogue-online", date: "2026-10-01", art: 7,
+      en: { title: "The catalogue is online",
+            lead: "Forty-eight paintings by Vangel Naumovski, gathered in one place for the first time.",
+            body: ["Today we are opening an online catalogue of the paintings of Vangel Naumovski. It brings together 48 works, from his early folk scenes of the 1950s to the galaxies of the early 1980s and the loose, late works of 1987.",
+                   "Every painting has its own page with a short story, the year, the period and the source of the image. You can browse the works in an endless grid, as a list, or one by one in a full-screen gallery.",
+                   "The catalogue is available in English and Macedonian. It will keep growing as more works are traced in museums, archives and auction records."] },
+      mk: { title: "Каталогот е онлајн",
+            lead: "Четириесет и осум слики од Ванѓел Наумовски, за првпат собрани на едно место.",
+            body: ["Денес отвораме онлајн каталог на сликите на Ванѓел Наумовски. Тој собира 48 дела, од неговите рани фолклорни сцени од педесеттите, до галаксиите од почетокот на осумдесеттите и слободните, доцни дела од 1987 година.",
+                   "Секоја слика има своја страница со кратка приказна, година, период и извор на сликата. Делата може да ги разгледувате во бескрајна мрежа, како листа, или едно по едно во галерија на цел екран.",
+                   "Каталогот е достапен на англиски и македонски јазик. Ќе продолжи да расте како што ќе се пронаоѓаат нови дела во музеи, архиви и аукциски записи."] } },
+    { slug: "twenty-years", date: "2026-06-13", art: 15,
+      en: { title: "Twenty years without Vangel Naumovski",
+            lead: "The painter died in Ohrid on 13 June 2006.",
+            body: ["Twenty years ago today, Vangel Naumovski died in Ohrid, the town by the lake that runs through so many of his titles: Lake Bride, Lacustrine Galaxy, Atlantis.",
+                   "He began as a storyteller of village life and folk legend, and in the early 1960s turned to the soft, glowing forms that made him one of the most distinctive surrealists of the region.",
+                   "To mark the anniversary, we invite you to revisit his work, from The Death of Kuzman to Spiral Galaxy."] },
+      mk: { title: "Дваесет години без Ванѓел Наумовски",
+            lead: "Сликарот почина во Охрид на 13 јуни 2006 година.",
+            body: ["Пред точно дваесет години, во Охрид почина Ванѓел Наумовски, во градот покрај езерото што се провлекува низ толку многу негови наслови: Езерска невеста, Езерска галаксија, Атлантида.",
+                   "Почнал како раскажувач на селскиот живот и народните легенди, а на почетокот на шеесеттите се свртел кон меките, светлечки форми што го направија еден од најосебените надреалисти во регионот.",
+                   "По повод годишнината, ве покануваме повторно да се навратите на неговото творештво, од Смртта на Кузман до Спирална галаксија."] } },
+    { slug: "auction-finds", date: "2026-04-20", art: 33,
+      en: { title: "From the auction rooms: works that resurfaced",
+            lead: "Several paintings in this catalogue are known only from recent sales.",
+            body: ["Not every painting by Naumovski hangs in a museum. Some have travelled through private collections and resurfaced at auction, which is often the only place where they can still be seen.",
+                   "Green Dreams (1967) and July Games (1983) were offered in Zagreb, Composition (Petite réalité) in France, and an untitled canvas from 1974 in Germany. Wilder Ort, painted in 1983, carries the label of a Munich gallery.",
+                   "Each of these works has its own page in the catalogue, with the auction record listed as its source."] },
+      mk: { title: "Од аукциските сали: дела што повторно се појавија",
+            lead: "Неколку слики од овој каталог се познати само од неодамнешни продажби.",
+            body: ["Не секоја слика на Наумовски виси во музеј. Некои патувале низ приватни збирки и повторно се појавиле на аукции, што често е единственото место каде што сè уште може да се видат.",
+                   "„Зелени сни“ (1967) и „Јулска игра“ (1983) беа понудени во Загреб, „Композиција (Petite réalité)“ во Франција, а едно ненасловено платно од 1974 година во Германија. „Wilder Ort“, насликана во 1983 година, носи етикета од галерија во Минхен.",
+                   "Секое од овие дела има своја страница во каталогот, со аукцискиот запис наведен како извор."] } },
+    { slug: "correcting-titles", date: "2026-03-05", art: 26,
+      en: { title: "Correcting the record: mislabelled titles",
+            lead: "Why some paintings here carry different titles than elsewhere online.",
+            body: ["While building the catalogue we compared every image against several sources. For nine paintings, the most widely used online database attached the wrong title to the image.",
+                   "The work often shown as Black Cradle of Bright Life, for example, is in fact Galaxy from the Other Side of the Sun, painted in 1980. Two other independent sources agreed with each other on every one of these cases.",
+                   "We follow those sources, and we note the remaining works that could only be checked against a single source."] },
+      mk: { title: "Исправка на записите: погрешни наслови",
+            lead: "Зошто некои слики тука носат поинакви наслови отколку на други места на интернет.",
+            body: ["Додека го градевме каталогот, ја споредивме секоја слика со неколку извори. Кај девет слики, најкористената онлајн база на податоци на сликата ѝ припишала погрешен наслов.",
+                   "Делото што често се прикажува како „Црна лулка на светлиот живот“, на пример, е всушност „Галаксија од другата страна на сонцето“, насликана во 1980 година. Два други независни извори се совпаѓаа меѓусебно во секој од овие случаи.",
+                   "Ги следиме тие извори и ги наведуваме преостанатите дела што можеа да се проверат само со еден извор."] } },
+    { slug: "dali-paris-1970", date: "2026-02-10", art: 12,
+      en: { title: "When Dalí saw Naumovski: Paris, 1970",
+            lead: "A visit that followed the painter for the rest of his life.",
+            body: ["In 1970 Naumovski held a solo exhibition in Paris. Among the visitors was Salvador Dalí, who called him a painter from a fairy tale.",
+                   "By then Naumovski had left his folk scenes behind. His canvases were filled with glowing organic forms, floating gardens and cosmic shapes, a world that had much in common with surrealism.",
+                   "Composition (Petite réalité), painted the same year, gives a sense of the work Paris saw: a small reality growing towards the sun."] },
+      mk: { title: "Кога Дали го виде Наумовски: Париз, 1970",
+            lead: "Посета што го следеше сликарот до крајот на животот.",
+            body: ["Во 1970 година Наумовски имал самостојна изложба во Париз. Меѓу посетителите бил и Салвадор Дали, кој го нарекол сликар од бајка.",
+                   "Дотогаш Наумовски веќе ги оставил зад себе фолклорните сцени. Неговите платна биле исполнети со светлечки органски форми, лебдечки градини и космички облици, свет што имал многу заедничко со надреализмот.",
+                   "„Композиција (Petite réalité)“, насликана истата година, дава претстава за делата што ги видел Париз: мала реалност што расте кон сонцето."] } },
+    { slug: "galaxy-series", date: "2026-01-15", art: 28,
+      en: { title: "The galaxy paintings, 1977–1981",
+            lead: "How the lake became a universe.",
+            body: ["From the late 1970s Naumovski painted a series of galaxies: Lacustrine Galaxy, White Galaxy, Horizontal Galaxy, Galaxy from the Other Side of the Sun and Spiral Galaxy.",
+                   "His space is not dark. It is bright and airy, closer to a morning over water than to the night sky, and Lacustrine Galaxy openly joins the lake and the cosmos in its title.",
+                   "Spiral Galaxy, from 1981, is one of the last works in the series."] },
+      mk: { title: "Сликите со галаксии, 1977–1981",
+            lead: "Како езерото стана универзум.",
+            body: ["Од крајот на седумдесеттите Наумовски насликал серија галаксии: Езерска галаксија, Бела галаксија, Хоризонтална галаксија, Галаксија од другата страна на сонцето и Спирална галаксија.",
+                   "Неговата вселена не е темна. Таа е светла и воздушеста, поблиску до утро над вода отколку до ноќно небо, а Езерска галаксија отворено ги спојува езерото и космосот во својот наслов.",
+                   "Спирална галаксија, од 1981 година, е едно од последните дела во серијата."] } },
+  ];
+
+  const SERVICES = [
+    { key: "licensing", art: 10,
+      en: { title: "Reproduction & licensing", text: "Permission to reproduce works from the catalogue in books, articles, films and exhibitions.",
+            points: ["High-resolution images on request", "Research and educational use", "Help with credits and captions"] },
+      mk: { title: "Репродукција и лиценцирање", text: "Дозвола за репродукција на дела од каталогот во книги, статии, филмови и изложби.",
+            points: ["Слики со висока резолуција на барање", "Истражувачка и образовна употреба", "Помош со потписи и наведување"] } },
+    { key: "loans", art: 23,
+      en: { title: "Exhibition loans", text: "Support for museums and galleries planning an exhibition that includes Naumovski's work.",
+            points: ["Locating works and their owners", "Background research and texts", "Curatorial advice"] },
+      mk: { title: "Позајмици за изложби", text: "Поддршка за музеи и галерии што планираат изложба со дела од Наумовски.",
+            points: ["Пронаоѓање дела и нивни сопственици", "Позадинско истражување и текстови", "Куративни совети"] } },
+    { key: "tours", art: 15,
+      en: { title: "Guided tours", text: "Guided walks through Naumovski's Ohrid and tours of exhibitions featuring his work.",
+            points: ["In English or Macedonian", "Groups of up to 20 people", "School and university groups welcome"] },
+      mk: { title: "Водени тури", text: "Водени прошетки низ Охрид на Наумовски и тури низ изложби со негови дела.",
+            points: ["На англиски или македонски", "Групи до 20 луѓе", "Добредојдени училишни и студентски групи"] } },
+    { key: "workshops", art: 31,
+      en: { title: "Educational workshops", text: "Workshops for children and adults on naive art, surrealism and Naumovski's techniques.",
+            points: ["For schools and art clubs", "Materials included", "About two hours"] },
+      mk: { title: "Едукативни работилници", text: "Работилници за деца и возрасни за наивната уметност, надреализмот и техниките на Наумовски.",
+            points: ["За училишта и ликовни клубови", "Материјалите се вклучени", "Околу два часа"] } },
+  ];
+
+  const PAGE_TEXT = {
+    en: {
+      newsIntro: "News, features and stories about Vangel Naumovski and his paintings.",
+      servicesIntro: "We help researchers, publishers, museums and schools work with the paintings of Vangel Naumovski.",
+      contactIntro: "Questions, requests or information about a work we have missed? Write to us.",
+      cookiesIntro: "This site uses as few cookies as possible.",
+      cookiesBody: [
+        ["What we use", "One cookie, vn_cookie_consent, remembers whether you accepted or declined cookies. If you accept, a second cookie, vn_lang, remembers your language (English or Macedonian). Both expire after six months."],
+        ["What we don't use", "No analytics, advertising or tracking cookies, and no cookies from other companies."],
+        ["Editors", "Only people who log in to manage the site receive WordPress login cookies."],
+        ["Your choice", "You can change your choice at any time with the button below. Declining does not limit the site in any way; your language simply isn't remembered."],
+      ],
+      cookieSettings: "Cookie settings",
+    },
+    mk: {
+      newsIntro: "Вести, текстови и приказни за Ванѓел Наумовски и неговите слики.",
+      servicesIntro: "Им помагаме на истражувачи, издавачи, музеи и училишта да работат со сликите на Ванѓел Наумовски.",
+      contactIntro: "Прашања, барања или информации за дело што сме го пропуштиле? Пишете ни.",
+      cookiesIntro: "Оваа страница користи што е можно помалку колачиња.",
+      cookiesBody: [
+        ["Што користиме", "Едно колаче, vn_cookie_consent, памети дали сте ги прифатиле или одбиле колачињата. Ако прифатите, второ колаче, vn_lang, го памети вашиот јазик (англиски или македонски). Двете истекуваат по шест месеци."],
+        ["Што не користиме", "Без колачиња за аналитика, рекламирање или следење, и без колачиња од други компании."],
+        ["Уредници", "Само лицата што се најавуваат за да ја уредуваат страницата добиваат WordPress колачиња за најава."],
+        ["Ваш избор", "Изборот можете да го промените во секое време со копчето подолу. Одбивањето на никаков начин не ја ограничува страницата; само вашиот јазик не се памети."],
+      ],
+      cookieSettings: "Поставки за колачиња",
+    },
+  };
+
+  /* ============ presentation pages: News, Services, Contact, Cookies ============ */
+  const pgMain = document.getElementById("pg-main");
+  const pgFooter = document.getElementById("p-footer");
+  const PAGES = ["news", "article", "services", "contact", "cookies"];
+  const isPage = (name) => PAGES.includes(name);
+  const lang2 = () => (locale === "mk" ? "mk" : "en");
+  const P = (k) => PAGE_TEXT[lang2()][k];
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  // dates are spelled out by hand: not every browser ships Macedonian month names
+  const MONTHS = {
+    en: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+    mk: ["јануари", "февруари", "март", "април", "мај", "јуни", "јули", "август", "септември", "октомври", "ноември", "декември"],
+  };
+  const fmtDate = (iso) => { const [y, m, d] = iso.split("-").map(Number); return `${d} ${MONTHS[lang2()][m - 1]} ${y}`; };
+  const BOX = `<svg width="4" height="4" viewBox="0 0 4 4" fill="currentColor" aria-hidden="true"><rect width="4" height="4"/></svg>`;
+  // [ LABEL ] with the black wipe-in fill
+  const bracket = (label, attrs, tag = "a") =>
+    `<${tag} class="group lbl-row uppercase" ${attrs}><span class="lbl-bracket">[</span><span class="lbl lbl-ink"><span>${label}</span></span><span class="lbl-bracket">]</span></${tag}>`;
+  const inkLink = (label, href) => `<span class="reveal-block pg-ink"><a class="group" href="${href}"><span class="lbl lbl-ink"><span>${label}</span></span></a></span>`;
+  const field = (label, value, i, wide, raw) =>
+    `<div class="${wide ? "is-wide" : ""}"><dt>${label}</dt><dd>${raw ? value : `<span class="reveal-block" style="--reveal-delay:${i * 80}ms">${value || "—"}</span>`}</dd></div>`;
+  const intro = (title, text) =>
+    `<section class="pg-col text-sm"><h1 class="ab-title">${title}</h1><div class="text-paint"><p>${text}</p></div></section>`;
+
+  function renderNews() {
+    const L = lang2();
+    return intro(t("news"), P("newsIntro")) + `<section class="ab-works pg-list">
+      <div class="ab-works-head"><p class="uppercase">${t("articles")}</p></div>
+      <div class="ab-rule"></div>
+      <ul class="ab-list">${NEWS.map((n) => `<li class="ab-item"><div class="ab-item-bg" aria-hidden="true"></div>
+        <a class="ab-row px-global" href="#/news/${n.slug}"><span class="ab-name"><span class="reveal-block">${esc(n[L].title)}</span></span><span class="ab-meta">${fmtDate(n.date)}</span><span class="ab-discover">${t("read")}</span></a>
+        <img class="l-thumb" src="${listWorks[n.art - 1].src}" alt="" width="256" height="256" loading="lazy"></li>`).join("")}</ul>
+    </section>`;
+  }
+
+  function renderArticle(slug) {
+    const L = lang2(), n = NEWS.find((x) => x.slug === slug) || NEWS[0], a = n[L], w = listWorks[n.art - 1];
+    const next = NEWS[(NEWS.indexOf(n) + 1) % NEWS.length];
+    document.title = `${a.title} (${ARTWORKS.length} ${t("titleSuffix")})`;
+    return `<article class="pg-art text-sm">
+      <div class="pg-art-text">
+        <div class="pg-back">${bracket(`← ${t("news")}`, 'href="#/news"')}</div>
+        <p class="pg-date">${fmtDate(n.date)}</p>
+        <h1 class="pg-title">${esc(a.title)}</h1>
+        <p class="pg-lead">${esc(a.lead)}</p>
+        <div class="text-paint pg-body">${a.body.map((p) => `<p>${esc(p)}</p>`).join("")}</div>
+      </div>
+      <figure class="pg-art-fig">
+        <a href="#/artwork/${w.id}" aria-label="${esc(w.fullName)}"><div class="reveal-image"><img src="${w.src}" alt="${esc(w.fullName)}"></div></a>
+        <figcaption class="aw-muted">${w.id}. ${esc(w.fullName)}</figcaption>
+      </figure>
+      <dl class="pg-art-sheet aw-sheet"><div class="aw-sheet-grid">
+        ${field(t("fDate"), fmtDate(n.date), 0)}
+        ${field(t("fSection"), t("news"), 1)}
+        ${field(t("relatedWork"), inkLink(esc(w.fullName), `#/artwork/${w.id}`), 2, true, true)}
+        ${field(t("nextArticle"), inkLink(esc(next[L].title), `#/news/${next.slug}`), 3, true, true)}
+      </div></dl>
+    </article>`;
+  }
+
+  function renderServices() {
+    const L = lang2();
+    return intro(t("services"), P("servicesIntro")) + `<section class="pg-services text-sm">${SERVICES.map((s, i) => {
+      const w = listWorks[s.art - 1], c = s[L];
+      return `<article class="pg-svc">
+        <div class="reveal-image"><img src="${w.src}" alt="${esc(w.fullName)}"></div>
+        <p class="aw-muted">${String(i + 1).padStart(2, "0")}</p>
+        <h2 class="pg-svc-title"><span class="reveal-block" style="--reveal-delay:${i * 80}ms">${esc(c.title)}</span></h2>
+        <p>${esc(c.text)}</p>
+        <ul>${c.points.map((p) => `<li>${esc(p)}</li>`).join("")}</ul>
+        ${bracket(t("enquire"), `href="#/contact" data-subject="${s.key}"`)}
+      </article>`;
+    }).join("")}</section>`;
+  }
+
+  /* contact */
+  let pendingSubject = "", contactSent = false;
+  const sentBlock = () => `<div class="pg-sent text-sm" id="pg-sent">
+      <p class="uppercase"><span class="reveal-block">${t("sentTitle")}</span></p>
+      <p>${t("sentText")}</p>
+      ${bracket(t("sendAnother"), 'href="#/contact" data-reset')}
+    </div>`;
+  function renderContact() {
+    const L = lang2(), subject = pendingSubject || "general";
+    pendingSubject = "";
+    const opts = [["general", t("subjGeneral")], ...SERVICES.map((s) => [s.key, s[L].title])]
+      .map(([k, v]) => `<option value="${k}"${k === subject ? " selected" : ""}>${esc(v)}</option>`).join("");
+    const input = (name, label, attrs = "") =>
+      `<label class="pg-field" data-f="${name}"><span class="pg-label">${label}</span>${attrs}<span class="pg-error"></span></label>`;
+    const form = `<form class="pg-form text-sm" id="pg-form" novalidate>
+        <div class="pg-form-row">
+          ${input("name", t("fName"), `<input name="name" autocomplete="name" maxlength="100">`)}
+          ${input("email", t("fEmail"), `<input name="email" type="email" autocomplete="email" maxlength="150">`)}
+        </div>
+        ${input("subject", t("fSubject"), `<select name="subject">${opts}</select>`)}
+        ${input("message", t("fMessage"), `<textarea name="message" maxlength="5000"></textarea>`)}
+        <div class="pg-hp" aria-hidden="true"><label>Website <input name="website" tabindex="-1" autocomplete="off"></label></div>
+        <div class="pg-field" data-f="consent">
+          <label class="pg-check"><input type="checkbox" name="consent" value="1"><span class="box">[${BOX}]</span><span>${t("consent")}</span></label>
+          <span class="pg-error"></span>
+        </div>
+        <p class="pg-error" id="pg-form-error" role="alert"></p>
+        ${bracket(t("send"), 'type="submit"', "button").replace('class="group lbl-row uppercase"', 'class="group lbl-row uppercase pg-submit"')}
+      </form>`;
+    return intro(t("contact"), P("contactIntro")) + `<section class="pg-contact text-sm">
+      <dl class="aw-sheet"><div class="aw-sheet-grid">
+        ${field(t("fEmail"), inkLink(CONTACT_INFO.email, `mailto:${CONTACT_INFO.email}`), 0, true, true)}
+        ${field(t("fPhone"), inkLink(CONTACT_INFO.phone, `tel:${CONTACT_INFO.phone.replace(/\s/g, "")}`), 1, false, true)}
+        ${field(t("fHours"), t("hoursVal"), 2)}
+        ${field(t("fAddress"), t("place"), 3, true)}
+      </div></dl>
+      ${contactSent ? sentBlock() : form}
+    </section>`;
+  }
+
+  function validate(form) {
+    const d = Object.fromEntries(new FormData(form));
+    const errs = {};
+    const name = (d.name || "").trim(), email = (d.email || "").trim(), msg = (d.message || "").trim();
+    if (!name) errs.name = t("errRequired");
+    if (!email) errs.email = t("errRequired");
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errs.email = t("errEmail");
+    if (!msg) errs.message = t("errRequired");
+    else if (msg.length < 10) errs.message = t("errShort");
+    if (!d.consent) errs.consent = t("errConsent");
+    form.querySelectorAll(".pg-field").forEach((f) => {
+      const e = errs[f.dataset.f] || "";
+      f.classList.toggle("has-error", !!e);
+      f.querySelector(".pg-error").textContent = e;
+    });
+    return errs;
+  }
+
+  async function submitContact(form) {
+    const errorLine = form.querySelector("#pg-form-error");
+    errorLine.textContent = "";
+    const first = Object.keys(validate(form))[0];
+    if (first) { form.elements[first]?.focus(); return; }
+    const btn = form.querySelector(".pg-submit"), label = btn.querySelector(".lbl span");
+    btn.disabled = true;
+    label.textContent = t("sending");
+    try {
+      if (form.elements.website.value) { /* a bot filled in the hidden field: pretend it worked */ }
+      else if (window.VN_CONTACT) {
+        // WordPress: saved as a private message in the dashboard
+        const body = new FormData(form);
+        body.append("action", "vn_contact");
+        body.append("nonce", window.VN_CONTACT.nonce);
+        body.append("lang", locale);
+        const res = await fetch(window.VN_CONTACT.url, { method: "POST", body, credentials: "same-origin" });
+        const json = await res.json().catch(() => null);
+        if (!res.ok || !json?.success) throw new Error("not sent");
+      } else {
+        await new Promise((r) => setTimeout(r, 700)); // static copy of the site: nothing to send to
+      }
+      contactSent = true;
+      const wrap = document.createElement("div");
+      wrap.innerHTML = sentBlock();
+      const sent = wrap.firstElementChild;
+      gsap.to(form, { autoAlpha: 0, duration: .3, ease: "linear", onComplete: () => {
+        form.replaceWith(sent);
+        gsap.from(sent, { autoAlpha: 0, duration: .6, ease: "linear" });
+        startPageReveals();
+        lenis?.resize();
+      } });
+    } catch {
+      errorLine.textContent = t("errSend");
+      btn.disabled = false;
+      label.textContent = t("send");
+    }
+  }
+
+  /* cookies */
+  const CONSENT = "vn_cookie_consent", LANG_COOKIE = "vn_lang", HALF_YEAR = 180 * 24 * 3600;
+  const readCookie = (k) => document.cookie.split("; ").find((c) => c.startsWith(`${k}=`))?.slice(k.length + 1) || "";
+  const writeCookie = (k, v, age = HALF_YEAR) => {
+    document.cookie = `${k}=${v}; max-age=${age}; path=/; SameSite=Lax${location.protocol === "https:" ? "; Secure" : ""}`;
+  };
+  const consentLabel = () => ({ accepted: t("cAccepted"), declined: t("cDeclined") })[readCookie(CONSENT)] || t("cNone");
+  function renderCookies() {
+    return `<section class="pg-col text-sm"><h1 class="ab-title">${t("cookies")}</h1>
+      <div class="text-paint"><p>${P("cookiesIntro")}</p>${P("cookiesBody").map(([h, p]) => `<h2>${h}</h2><p>${p}</p>`).join("")}</div>
+      <p class="pg-status aw-muted">${t("cookieStatus")}: <span id="pg-consent">${consentLabel()}</span></p>
+      <div class="pg-actions">${bracket(P("cookieSettings"), 'type="button" data-cookie-settings', "button")}</div>
+    </section>`;
+  }
+
+  const banner = document.getElementById("cookie-banner");
+  function showBanner() {
+    gsap.killTweensOf(banner);
+    gsap.fromTo(banner, { autoAlpha: 0, y: 16 }, { autoAlpha: 1, y: 0, duration: .6, ease: "expo.out" });
+  }
+  function hideBanner() {
+    gsap.killTweensOf(banner);
+    gsap.to(banner, { autoAlpha: 0, y: 16, duration: .4, ease: "power2.in" });
+  }
+  function setConsent(v) {
+    writeCookie(CONSENT, v);
+    if (v === "accepted") writeCookie(LANG_COOKIE, locale); else writeCookie(LANG_COOKIE, "", 0);
+    hideBanner();
+    const status = document.getElementById("pg-consent");
+    if (status) status.textContent = consentLabel();
+  }
+  // the language is only remembered with consent
+  function rememberLang() { if (readCookie(CONSENT) === "accepted") writeCookie(LANG_COOKIE, locale); }
+  function restoreLang() {
+    const l = readCookie(CONSENT) === "accepted" ? readCookie(LANG_COOKIE) : "";
+    if (DICT[l]) locale = l;
+  }
+  document.getElementById("cb-accept").addEventListener("click", () => setConsent("accepted"));
+  document.getElementById("cb-decline").addEventListener("click", () => setConsent("declined"));
+
+  /* rendering, reveals and text painting */
+  function renderPage(name, id) {
+    pgMain.innerHTML = name === "news" ? renderNews() : name === "article" ? renderArticle(id)
+      : name === "services" ? renderServices() : name === "contact" ? renderContact() : renderCookies();
+    if (name !== "article") document.title = `${t(name)} (${ARTWORKS.length} ${t("titleSuffix")})`;
+    pgMain.querySelectorAll(".reveal-image img").forEach(watchLoaded);
+    paintPage();
+    requestAnimationFrame(() => requestAnimationFrame(startPageReveals));
+  }
+  // a language switch re-renders the page but keeps what was typed into the form
+  function rerenderPage() {
+    const form = pgMain.querySelector("#pg-form");
+    const kept = form ? [...form.elements].filter((el) => el.name).map((el) => [el.name, el.type === "checkbox" ? el.checked : el.value]) : [];
+    if (form) pendingSubject = form.elements.subject.value;
+    renderPage(view, routeId);
+    const f = pgMain.querySelector("#pg-form");
+    if (f) kept.forEach(([k, v]) => { const el = f.elements[k]; if (el) el.type === "checkbox" ? (el.checked = v) : (el.value = v); });
+  }
+
+  let pgPending = [];
+  const nearView = (r, vh) => r.top < vh * .85 && r.bottom > 0;
+  function startPageReveals() {
+    pgPending = [];
+    pgMain.querySelectorAll(".reveal-block:not(.is-inview)").forEach((el) => pgPending.push({ el, test: anyVisible, onIn: (x) => {
+      // list rows come in at random like the List page
+      if (x.closest(".ab-list")) x.style.setProperty("--reveal-delay", `${Math.floor(520 * Math.random())}ms`);
+      x.classList.add("is-inview");
+    } }));
+    pgMain.querySelectorAll(".reveal-image:not(.is-inview)").forEach((el) => pgPending.push({ el, test: nearView, onIn: (x) => x.classList.add("is-inview") }));
+    checkPageReveals();
+  }
+  function checkPageReveals() {
+    if (!pgPending.length) return;
+    const vh = innerHeight;
+    pgPending = pgPending.filter((w) => {
+      const r = w.el.getBoundingClientRect();
+      if (!r.height || !w.test(r, vh)) return true;
+      w.onIn(w.el);
+      return false;
+    });
+  }
+  // text paints from grey to black as it passes 80% of the screen, as on the About page
+  function paintPage() {
+    const h = innerHeight;
+    pgMain.querySelectorAll(".text-paint").forEach((el) => {
+      const r = el.getBoundingClientRect();
+      const p = Math.min(1, Math.max(0, (.8 * h - r.top) / (r.height || 1)));
+      el.style.setProperty("--paint", `${(p * 100).toFixed(2)}%`);
+    });
+  }
+  window.addEventListener("resize", () => { if (isPage(view)) { paintPage(); checkPageReveals(); } });
+
+  pgMain.addEventListener("click", (e) => {
+    if (e.target.closest("[data-cookie-settings]")) { showBanner(); return; }
+    const a = e.target.closest('a[href^="#/"]');
+    if (!a) return;
+    e.preventDefault();
+    if (a.hasAttribute("data-reset")) { contactSent = false; rerenderPage(); lenis?.resize(); return; }
+    if (a.dataset.subject) pendingSubject = a.dataset.subject;
+    navigate(a.getAttribute("href"));
+  });
+  pgMain.addEventListener("submit", (e) => {
+    if (e.target.id !== "pg-form") return;
+    e.preventDefault();
+    submitContact(e.target);
+  });
+  pgMain.addEventListener("input", (e) => {
+    const f = e.target.closest(".pg-field.has-error");
+    if (f) { f.classList.remove("has-error"); f.querySelector(".pg-error").textContent = ""; }
+  });
+
+  // page exit: sections fade out one after another, then the footer
+  function leavePage(done) {
+    const kids = [...pgMain.children];
+    const sections = kids.length === 1 ? [...kids[0].children] : kids;
+    const tl = gsap.timeline({ onComplete: () => {
+      done();
+      gsap.set([...sections, pgFooter], { clearProps: "opacity,visibility" });
+    } });
+    tl.to(sections, { autoAlpha: 0, duration: .3, ease: "linear", stagger: { each: .15, from: "start" } }, 0)
+      .to(pgFooter, { autoAlpha: 0, duration: .3, ease: "linear" }, .15 * Math.max(0, sections.length - 1));
+    return tl;
+  }
+
+  /* ============ routing: Grid / List / Gallery / About / Artwork / pages ============ */
+  let view = null, routeId = 0, gridBooted = false, lenis = null, backHash = "#/";
+  const ROUTES = { "#/": "grid", "#/archive": "list", "#/gallery": "gallery", "#/about": "about",
+    "#/news": "news", "#/services": "services", "#/contact": "contact", "#/cookies": "cookies" };
+  const HREFS = { grid: "#/", list: "#/archive", gallery: "#/gallery", about: "#/about",
+    news: "#/news", article: "#/news", services: "#/services", contact: "#/contact", cookies: "#/cookies" };
   const parseRoute = (hash) => {
     const m = /^#\/artwork\/(\d+)$/.exec(hash);
     if (m) return { name: "artwork", id: Math.min(Math.max(1, +m[1]), listWorks.length) };
+    const n = /^#\/news\/([\w-]+)$/.exec(hash);
+    if (n) return NEWS.some((x) => x.slug === n[1]) ? { name: "article", id: n[1] } : { name: "news", id: 0 };
     return { name: ROUTES[hash] || "grid", id: 0 };
   };
 
@@ -2472,16 +3076,18 @@ $vn_base = trailingslashit( get_template_directory_uri() );
   const smoothScroll = () => new Lenis({ autoRaf: true, lerp: .1, smoothWheel: true, wheelMultiplier: 1 });
 
   function applyRoute(name, id = 0) {
-    if (name === view && (name !== "artwork" || id === artId)) return;
+    if (name === view && id === routeId) return;
     const from = view;
     view = name;
+    routeId = id;
     setCurrentNav(name);
-    if (name !== "artwork") backHash = HREFS[name];
+    if (name !== "artwork") backHash = name === "article" ? `#/news/${id}` : HREFS[name];
     // tear down the view being left
     if (from === "list") { listObserver?.disconnect(); document.body.classList.remove("is-list"); }
     if (from === "gallery") { gallery.stop(); document.body.classList.remove("is-gallery"); }
     if (from === "about") document.body.classList.remove("is-about");
     if (from === "artwork") exitArtwork();
+    if (isPage(from)) { pgPending = []; document.body.classList.remove("is-page"); document.title = `${ARTWORKS.length} ${t("titleSuffix")}`; }
     lenis?.destroy(); lenis = null;
     window.scrollTo(0, 0);
     if (name !== "grid") {
@@ -2507,6 +3113,12 @@ $vn_base = trailingslashit( get_template_directory_uri() );
       enterArtwork(id);
       lenis = smoothScroll();
       lenis.on("scroll", () => { updateArtworkDim(); checkArtworkReveals(); });
+    } else if (isPage(name)) {
+      document.body.classList.add("is-page");
+      if (name === "contact" && from !== "contact") contactSent = false;
+      renderPage(name, id);
+      lenis = smoothScroll();
+      lenis.on("scroll", () => { paintPage(); checkPageReveals(); });
     } else if (!gridBooted) {
       gridBooted = true;
       (document.fonts?.ready ?? Promise.resolve()).then(() => {
@@ -2590,20 +3202,22 @@ $vn_base = trailingslashit( get_template_directory_uri() );
 
   function navigate(hash, clicked = null) {
     const target = parseRoute(hash);
-    if ((target.name === view && (target.name !== "artwork" || target.id === artId)) || leaving) return;
+    if ((target.name === view && target.id === routeId) || leaving) return;
     // switch right away (the hashchange that follows is then a no-op), so nothing flashes back
     const done = () => { leaving = null; location.hash = hash; applyRoute(target.name, target.id); };
     leaving = view === "grid" ? leaveGrid(done, clicked) : view === "list" ? leaveList(done)
-      : view === "about" ? leaveAbout(done) : view === "artwork" ? leaveArtwork(done) : leaveGallery(done);
+      : view === "about" ? leaveAbout(done) : view === "artwork" ? leaveArtwork(done) : isPage(view) ? leavePage(done) : leaveGallery(done);
   }
-  document.querySelectorAll('a[href="#/"], a[href="#/archive"], a[href="#/gallery"], a[href="#/about"]').forEach((a) => {
-    if (a.closest("#artwork-view")) return; // handled with the artwork page
+  document.querySelectorAll(Object.keys(ROUTES).map((h) => `a[href="${h}"]`).join(", ")).forEach((a) => {
+    if (a.closest("#aw-artist-reveal")) return; // handled with the artwork page
     a.addEventListener("click", (e) => { e.preventDefault(); navigate(a.getAttribute("href")); });
   });
   document.querySelector(".aw-close").addEventListener("click", (e) => { e.preventDefault(); navigate(backHash); });
 
   /* ============ boot ============ */
+  restoreLang();
   applyLocale();
+  if (!readCookie(CONSENT)) setTimeout(showBanner, 1500);
   { const r = parseRoute(location.hash); applyRoute(r.name, r.id); }
 })();
 </script>

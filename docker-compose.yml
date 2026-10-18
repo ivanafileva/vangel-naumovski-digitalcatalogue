@@ -26,11 +26,13 @@ services:
         }
     volumes:
       - ./.stack-data/uploads:/var/www/html/wp-content/uploads
-    cpus: 0.5
-    mem_limit: 512m
+    cpus: 0.25
+    mem_limit: 256m
 
   db:
     image: mariadb:11.4
+    # small memory footprint so the stack fits the team quota
+    command: --innodb-buffer-pool-size=64M --performance-schema=OFF --max-connections=40
     environment:
       MARIADB_DATABASE: wordpress
       MARIADB_USER: wordpress
@@ -43,5 +45,5 @@ services:
       interval: 5s
       timeout: 5s
       retries: 30
-    cpus: 0.5
-    mem_limit: 512m
+    cpus: 0.25
+    mem_limit: 256m

@@ -11,7 +11,7 @@ custom WordPress theme and deployed on [RepoRun](https://reporun.finki.net.mk).
 | `stack.yml` | Tells RepoRun to expose the `wordpress` service on port 80, publicly |
 | `wordpress/Dockerfile` | Official WordPress image + WP-CLI + the theme |
 | `wordpress/reporun-init.sh` | On start-up: installs WordPress (first boot only) and activates the theme |
-| `wordpress/theme/vangel-naumovski/` | The theme (grid, list, gallery, about, artwork, news, services, contact and cookie pages) |
+| `wordpress/theme/vangel-naumovski/` | The theme (grid, list, gallery, about, artwork, team, news, services, contact and cookie pages) |
 
 Database files and uploads are stored by RepoRun under `.stack-data/` and are never committed.
 

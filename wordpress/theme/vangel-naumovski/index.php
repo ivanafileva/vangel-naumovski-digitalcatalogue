@@ -435,7 +435,7 @@ $vn_base = trailingslashit( get_template_directory_uri() );
 
   /* the header holds more links now: between tablet and small desktop they move into the Menu */
   .nav-end { gap: 1rem; white-space: nowrap; }
-  @media (min-width: 768px) and (max-width: 1199px) {
+  @media (min-width: 768px) and (max-width: 1299px) {
     #navbar .nav-menu, #navbar .nav-end { display: none; }
     #menu-btn.mobile-only { display: block !important; grid-column: 3; }
   }
@@ -490,6 +490,10 @@ $vn_base = trailingslashit( get_template_directory_uri() );
   .pg-svc ul { list-style: none; margin-bottom: 1.25rem; color: var(--muted); }
   .pg-svc li::before { content: "— "; }
   .pg-svc .lbl-row { margin-left: -.25rem; width: fit-content; }
+  .pg-member { padding-top: .75rem; border-top: 1px solid rgba(0, 0, 0, .3); }
+  .pg-member .pg-svc-title { margin-bottom: .25rem; }
+  .pg-member p + p { margin-top: 1rem; }
+  .pg-member .pg-ink { display: inline-block; margin-top: 1.25rem; }
 
   /* contact: facts on the left like an artwork sheet, the form across the other two columns */
   .pg-contact { display: grid; grid-template-columns: 1fr; gap: 4rem; padding-bottom: 6rem; letter-spacing: -0.04em; }
@@ -707,6 +711,9 @@ $vn_base = trailingslashit( get_template_directory_uri() );
       <a class="group lbl-row text-sm uppercase nav-about" href="#/about">
         <span class="lbl"><span data-i18n="aboutAction">About the Project</span></span>
       </a>
+      <a class="group lbl-row text-sm uppercase nav-extra" href="#/team">
+        <span class="lbl"><span data-i18n="team">Team</span></span>
+      </a>
       <a class="group lbl-row text-sm uppercase nav-extra" href="#/news">
         <span class="lbl"><span data-i18n="news">News</span></span>
       </a>
@@ -918,6 +925,7 @@ $vn_base = trailingslashit( get_template_directory_uri() );
       <a class="uppercase" href="#/archive" data-i18n="list">List</a>
       <a class="uppercase" href="#/gallery" data-i18n="gallery">Gallery</a>
       <a class="uppercase" href="#/about" data-i18n="about">About us</a>
+      <a class="uppercase" href="#/team" data-i18n="team">Team</a>
       <a class="uppercase" href="#/news" data-i18n="news">News</a>
       <a class="uppercase" href="#/services" data-i18n="services">Services</a>
       <a class="uppercase" href="#/contact" data-i18n="contact">Contact</a>
@@ -967,7 +975,7 @@ $vn_base = trailingslashit( get_template_directory_uri() );
       rights: "All rights reserved ©", place: "Skopje, North Macedonia",
       aboutTitle: "About the artist", works: "Artworks", searchWorkPh: "Search artwork…", discover: "[ DISCOVER ]",
       story: "Story", artistLabel: "Artist", fTitle: "Title", fYear: "Year", fPeriod: "Period", fMedium: "Medium", fSize: "Size", fSource: "Source",
-      news: "News", services: "Services", contact: "Contact", cookies: "Cookie policy",
+      team: "Team", news: "News", services: "Services", contact: "Contact", cookies: "Cookie policy",
       articles: "Articles", read: "[ READ ]", fDate: "Date", fSection: "Section", relatedWork: "Related artwork", nextArticle: "Next article",
       enquire: "Enquire", fEmail: "Email", fPhone: "Phone", fHours: "Hours", hoursVal: "Mon–Fri, 10:00–16:00", fAddress: "Address",
       fName: "Name", fSubject: "Subject", subjGeneral: "General question", fMessage: "Message",
@@ -989,7 +997,7 @@ $vn_base = trailingslashit( get_template_directory_uri() );
       rights: "Сите права се задржани ©", place: "Скопје, Северна Македонија",
       aboutTitle: "За уметникот", works: "Дела", searchWorkPh: "Пребарај дело…", discover: "[ ОТКРИЈ ]",
       story: "Приказна", artistLabel: "Уметник", fTitle: "Наслов", fYear: "Година", fPeriod: "Период", fMedium: "Техника", fSize: "Димензии", fSource: "Извор",
-      news: "Вести", services: "Услуги", contact: "Контакт", cookies: "Политика за колачиња",
+      team: "Тим", news: "Вести", services: "Услуги", contact: "Контакт", cookies: "Политика за колачиња",
       articles: "Написи", read: "[ ПРОЧИТАЈ ]", fDate: "Датум", fSection: "Рубрика", relatedWork: "Поврзано дело", nextArticle: "Следен напис",
       enquire: "Побарај", fEmail: "Е-пошта", fPhone: "Телефон", fHours: "Работно време", hoursVal: "Пон–Пет, 10:00–16:00", fAddress: "Адреса",
       fName: "Име", fSubject: "Тема", subjGeneral: "Општо прашање", fMessage: "Порака",
@@ -1558,7 +1566,7 @@ $vn_base = trailingslashit( get_template_directory_uri() );
         onComplete: () => { menu.style.display = "none"; gsap.set(menu, { clipPath: "polygon(-1% 0%, -1% 0%, -1% 100%, -1% 100%)" }); } });
     }
   });
-  const isRouteLink = (a) => ["#/", "#/archive", "#/gallery", "#/about", "#/news", "#/services", "#/contact", "#/cookies"].includes(a.getAttribute("href"));
+  const isRouteLink = (a) => ["#/", "#/archive", "#/gallery", "#/about", "#/team", "#/news", "#/services", "#/contact", "#/cookies"].includes(a.getAttribute("href"));
   document.querySelectorAll('a[href^="#/"]').forEach((a) => {
     if (a.classList.contains("gi")) return;
     a.addEventListener("click", (e) => {
@@ -2729,9 +2737,22 @@ $vn_base = trailingslashit( get_template_directory_uri() );
             points: ["За училишта и ликовни клубови", "Материјалите се вклучени", "Околу два часа"] } },
   ];
 
+  // the people behind the catalogue (fictional)
+  const TEAM = [
+    { email: "elena", en: { name: "Elena Trajkovska", role: "Curator", bio: "Leads the catalogue: researches each painting, its date and its story, and writes the texts." },
+                      mk: { name: "Елена Трајковска", role: "Кураторка", bio: "Го води каталогот: ја истражува секоја слика, нејзиниот датум и приказна и ги пишува текстовите." } },
+    { email: "marko", en: { name: "Marko Petrovski", role: "Archivist", bio: "Traces works in museum records, auction catalogues and private collections, and checks every source." },
+                      mk: { name: "Марко Петровски", role: "Архивист", bio: "Ги бара делата во музејски записи, аукциски каталози и приватни збирки и го проверува секој извор." } },
+    { email: "ana",   en: { name: "Ana Stojanovska", role: "Education & tours", bio: "Leads the guided walks through Ohrid and the workshops for schools and art clubs." },
+                      mk: { name: "Ана Стојановска", role: "Едукација и тури", bio: "Ги води прошетките низ Охрид и работилниците за училишта и ликовни клубови." } },
+    { email: "bojan", en: { name: "Bojan Nikolovski", role: "Licensing & loans", bio: "Handles reproduction requests and helps museums and galleries borrow works for exhibitions." },
+                      mk: { name: "Бојан Николовски", role: "Лиценцирање и позајмици", bio: "Ги обработува барањата за репродукција и им помага на музеите и галериите да позајмат дела за изложби." } },
+  ];
+
   const PAGE_TEXT = {
     en: {
       newsIntro: "News, features and stories about Vangel Naumovski and his paintings.",
+      teamIntro: "A small team of researchers and educators keeps the catalogue growing and answers your questions.",
       servicesIntro: "We help researchers, publishers, museums and schools work with the paintings of Vangel Naumovski.",
       contactIntro: "Questions, requests or information about a work we have missed? Write to us.",
       cookiesIntro: "This site uses as few cookies as possible.",
@@ -2745,6 +2766,7 @@ $vn_base = trailingslashit( get_template_directory_uri() );
     },
     mk: {
       newsIntro: "Вести, текстови и приказни за Ванѓел Наумовски и неговите слики.",
+      teamIntro: "Мал тим на истражувачи и едукатори се грижи каталогот да расте и одговара на вашите прашања.",
       servicesIntro: "Им помагаме на истражувачи, издавачи, музеи и училишта да работат со сликите на Ванѓел Наумовски.",
       contactIntro: "Прашања, барања или информации за дело што сме го пропуштиле? Пишете ни.",
       cookiesIntro: "Оваа страница користи што е можно помалку колачиња.",
@@ -2761,7 +2783,7 @@ $vn_base = trailingslashit( get_template_directory_uri() );
   /* ============ presentation pages: News, Services, Contact, Cookies ============ */
   const pgMain = document.getElementById("pg-main");
   const pgFooter = document.getElementById("p-footer");
-  const PAGES = ["news", "article", "services", "contact", "cookies"];
+  const PAGES = ["team", "news", "article", "services", "contact", "cookies"];
   const isPage = (name) => PAGES.includes(name);
   const lang2 = () => (locale === "mk" ? "mk" : "en");
   const P = (k) => PAGE_TEXT[lang2()][k];
@@ -2816,6 +2838,18 @@ $vn_base = trailingslashit( get_template_directory_uri() );
         ${field(t("nextArticle"), inkLink(esc(next[L].title), `#/news/${next.slug}`), 3, true, true)}
       </div></dl>
     </article>`;
+  }
+
+  function renderTeam() {
+    const L = lang2(), domain = CONTACT_INFO.email.split("@")[1];
+    return intro(t("team"), P("teamIntro")) + `<section class="pg-services pg-team text-sm">${TEAM.map((m, i) => `
+      <article class="pg-member">
+        <p class="aw-muted">${String(i + 1).padStart(2, "0")}</p>
+        <h2 class="pg-svc-title"><span class="reveal-block" style="--reveal-delay:${i * 80}ms">${esc(m[L].name)}</span></h2>
+        <p class="aw-muted">${esc(m[L].role)}</p>
+        <p>${esc(m[L].bio)}</p>
+        ${inkLink(`${m.email}@${domain}`, `mailto:${m.email}@${domain}`)}
+      </article>`).join("")}</section>`;
   }
 
   function renderServices() {
@@ -2987,7 +3021,7 @@ $vn_base = trailingslashit( get_template_directory_uri() );
   /* rendering, reveals and text painting */
   function renderPage(name, id) {
     pgMain.innerHTML = name === "news" ? renderNews() : name === "article" ? renderArticle(id)
-      : name === "services" ? renderServices() : name === "contact" ? renderContact() : renderCookies();
+      : name === "team" ? renderTeam() : name === "services" ? renderServices() : name === "contact" ? renderContact() : renderCookies();
     if (name !== "article") document.title = `${t(name)} (${ARTWORKS.length} ${t("titleSuffix")})`;
     pgMain.querySelectorAll(".reveal-image img").forEach(watchLoaded);
     paintPage();
@@ -3110,9 +3144,9 @@ $vn_base = trailingslashit( get_template_directory_uri() );
   /* ============ routing: Grid / List / Gallery / About / Artwork / pages ============ */
   let view = null, routeId = 0, gridBooted = false, lenis = null, backHash = "#/";
   const ROUTES = { "#/": "grid", "#/archive": "list", "#/gallery": "gallery", "#/about": "about",
-    "#/news": "news", "#/services": "services", "#/contact": "contact", "#/cookies": "cookies" };
+    "#/team": "team", "#/news": "news", "#/services": "services", "#/contact": "contact", "#/cookies": "cookies" };
   const HREFS = { grid: "#/", list: "#/archive", gallery: "#/gallery", about: "#/about",
-    news: "#/news", article: "#/news", services: "#/services", contact: "#/contact", cookies: "#/cookies" };
+    team: "#/team", news: "#/news", article: "#/news", services: "#/services", contact: "#/contact", cookies: "#/cookies" };
   const parseRoute = (hash) => {
     const m = /^#\/artwork\/(\d+)$/.exec(hash);
     if (m) return { name: "artwork", id: Math.min(Math.max(1, +m[1]), listWorks.length) };

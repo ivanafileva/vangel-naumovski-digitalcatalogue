@@ -438,13 +438,20 @@ $vn_base = trailingslashit( get_template_directory_uri() );
   .nav-drop { position: relative; }
   body.is-artwork .nav-drop { display: none; }
   .nav-links {
-    position: absolute; top: calc(100% + .75rem); right: 0;
-    display: flex; flex-direction: column; align-items: flex-end; gap: .375rem; pointer-events: none;
+    position: fixed; top: 3.25rem; right: 1rem; z-index: 9999;
+    display: flex; flex-direction: column; align-items: flex-end; gap: .375rem;
+    padding: .75rem .75rem .875rem; background: #000; color: #fff;
+    clip-path: inset(0 0 100% 0); transition: clip-path .5s var(--ease-in-out); pointer-events: none;
   }
-  .nav-drop.is-open .nav-links { pointer-events: auto; }
+  @media (min-width: 96rem) { .nav-links { right: 1.5rem; } }
+  @media (max-width: 767px) { .nav-links { display: none; } }
+  body.is-artwork .nav-links { display: none; }
+  .nav-links.is-open { clip-path: inset(0); pointer-events: auto; }
+  body.nav-open #search-ui { opacity: 0 !important; pointer-events: none !important; transition: opacity .2s; }
+  .nav-toggle:focus:not(:focus-visible) { outline: none; }
   .nav-links a { display: flex; overflow: hidden; }
   .nav-li { display: inline-flex; transform: translateY(110%); transition: transform .45s var(--ease-in-out); }
-  .nav-drop.is-open .nav-li { transform: translateY(0); transition-delay: calc(var(--i) * 50ms); }
+  .nav-links.is-open .nav-li { transform: translateY(0); transition-delay: calc(.1s + var(--i) * 50ms); }
 
   /* footer: cookie policy in the third column */
   .l-footer-end a { margin: -.25rem; display: inline-flex; }
@@ -717,13 +724,6 @@ $vn_base = trailingslashit( get_template_directory_uri() );
         <button type="button" class="group lbl-row text-sm uppercase nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links">
           <span class="lbl-bracket">[</span><span class="lbl"><span data-i18n="menu">Menu</span></span><span class="lbl-bracket">]</span>
         </button>
-        <nav class="nav-links text-sm uppercase" id="nav-links" inert>
-        <a class="group" href="#/about" style="--i:0"><span class="nav-li"><span class="lbl"><span data-i18n="aboutAction">About the Artist</span></span></span></a>
-        <a class="group" href="#/team" style="--i:1"><span class="nav-li"><span class="lbl"><span data-i18n="team">Team</span></span></span></a>
-        <a class="group" href="#/news" style="--i:2"><span class="nav-li"><span class="lbl"><span data-i18n="news">News</span></span></span></a>
-        <a class="group" href="#/services" style="--i:3"><span class="nav-li"><span class="lbl"><span data-i18n="services">Services</span></span></span></a>
-        <a class="group" href="#/contact" style="--i:4"><span class="nav-li"><span class="lbl"><span data-i18n="contact">Contact</span></span></span></a>
-        </nav>
       </div>
       <a class="group lbl-row text-sm uppercase aw-close" href="#/close">
         <span class="lbl-bracket">[</span><span class="lbl"><span data-i18n="close">Close</span></span><span class="lbl-bracket">]</span>
@@ -732,6 +732,14 @@ $vn_base = trailingslashit( get_template_directory_uri() );
     <button type="button" class="menu-btn mobile-only uppercase" id="menu-btn" data-i18n="menu">Menu</button>
   </div>
 </header>
+
+  <nav class="nav-links text-sm uppercase" id="nav-links" inert>
+  <a class="group" href="#/about" style="--i:0"><span class="nav-li"><span class="lbl"><span data-i18n="aboutAction">About the Artist</span></span></span></a>
+  <a class="group" href="#/team" style="--i:1"><span class="nav-li"><span class="lbl"><span data-i18n="team">Team</span></span></span></a>
+  <a class="group" href="#/news" style="--i:2"><span class="nav-li"><span class="lbl"><span data-i18n="news">News</span></span></span></a>
+  <a class="group" href="#/services" style="--i:3"><span class="nav-li"><span class="lbl"><span data-i18n="services">Services</span></span></span></a>
+  <a class="group" href="#/contact" style="--i:4"><span class="nav-li"><span class="lbl"><span data-i18n="contact">Contact</span></span></span></a>
+</nav>
 
 <div id="search-ui" class="px-global">
   <search class="search-col text-sm uppercase">
@@ -3145,6 +3153,10 @@ $vn_base = trailingslashit( get_template_directory_uri() );
   const navLinks = document.getElementById("nav-links");
   function setNavDrop(open) {
     navDrop.classList.toggle("is-open", open);
+    navLinks.classList.toggle("is-open", open);
+    // the grid's search bar sits where the links open: it steps aside while the menu is open
+    document.body.classList.toggle("nav-open", open);
+    if (open && S.open) closeAll();
     navToggle.setAttribute("aria-expanded", open);
     navLinks.inert = !open;
     const label = navToggle.querySelector("[data-i18n]");
@@ -3177,7 +3189,7 @@ $vn_base = trailingslashit( get_template_directory_uri() );
   };
 
   function setCurrentNav(name) {
-    document.querySelectorAll("#navbar .nav-menu a, #navbar .nav-end a").forEach((a) => {
+    document.querySelectorAll("#navbar .nav-menu a, #navbar .nav-end a, #nav-links a").forEach((a) => {
       a.querySelector(".lbl").classList.toggle("is-current", a.getAttribute("href") === HREFS[name]);
     });
   }

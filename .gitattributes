@@ -1,0 +1,4 @@
+# shell scripts run inside Linux containers: keep Unix line endings
+*.sh text eol=lf
+*.yml text eol=lf
+Dockerfile text eol=lf

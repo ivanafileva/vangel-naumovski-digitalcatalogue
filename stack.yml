@@ -1,0 +1,8 @@
+version: 1
+ingress:
+  - name: site
+    service: wordpress   # the compose service to expose
+    port: 80             # Apache inside the WordPress container
+    primary: true
+    access:
+      type: public       # anyone with the link can view the site

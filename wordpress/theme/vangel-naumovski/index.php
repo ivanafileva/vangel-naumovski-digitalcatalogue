@@ -447,7 +447,9 @@ $vn_base = trailingslashit( get_template_directory_uri() );
   @media (max-width: 767px) { .nav-links { display: none; } }
   body.is-artwork .nav-links { display: none; }
   .nav-links.is-open { clip-path: inset(0); pointer-events: auto; }
-  body.nav-open #search-ui { opacity: 0 !important; pointer-events: none !important; transition: opacity .2s; }
+  /* the grid's search bar moves down to make room for the open menu */
+  #search-ui { transition: opacity 1s, transform .5s var(--ease-in-out); }
+  body.nav-open #search-ui { transform: translateY(var(--nav-push, 0px)); }
   .nav-toggle:focus:not(:focus-visible) { outline: none; }
   .nav-links a { display: flex; overflow: hidden; }
   .nav-li { display: inline-flex; transform: translateY(110%); transition: transform .45s var(--ease-in-out); }
@@ -3154,7 +3156,11 @@ $vn_base = trailingslashit( get_template_directory_uri() );
   function setNavDrop(open) {
     navDrop.classList.toggle("is-open", open);
     navLinks.classList.toggle("is-open", open);
-    // the grid's search bar sits where the links open: it steps aside while the menu is open
+    // the grid's search bar sits where the links open: it moves down below them
+    if (open) {
+      const push = navLinks.getBoundingClientRect().bottom + 16 - parseFloat(getComputedStyle(searchUI).top);
+      searchUI.style.setProperty("--nav-push", `${Math.max(0, push)}px`);
+    }
     document.body.classList.toggle("nav-open", open);
     if (open && S.open) closeAll();
     navToggle.setAttribute("aria-expanded", open);
